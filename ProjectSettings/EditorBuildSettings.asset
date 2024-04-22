@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 0
+    path: Assets/Scenes/SampleScene.unity
+    guid: 55daccc09a3b69647bbab145b54a3ab3
+  - enabled: 0
+    path: Assets/TetrisV4.unity
+    guid: 6963c2ee3200e5c45be478be00fde312
+  - enabled: 1
+    path: Assets/1-Scene.unity
+    guid: f3583337dbd76b44a9dc108fab6b3178
+  - enabled: 1
+    path: Assets/2-Scene.unity
+    guid: af6bd4811109f2249a0fdbbb1f0111e6
+  m_configObjects:
+    Unity.XR.Oculus.Settings: {fileID: 11400000, guid: deb5a70fe5189f546a1e5bd8d80cfc5b,
+      type: 2}
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: a48edbf724eb8f04bb685f9f451da000,
+      type: 2}
