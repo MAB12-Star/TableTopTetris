@@ -136,7 +136,7 @@ public class Grid1 : MonoBehaviour
             return;
         }
 
-        float colliderOffset = 0.05f; // Offset value for collider size
+        float colliderOffset = 0.02f; // Offset value for collider size
 
         gridCells = new GridCell[width, height, depth]; // Initialize the table array
         Debug.Log("Grid Dimensions: " + width + " x " + height + " x " + depth);
@@ -219,8 +219,12 @@ public class Grid1 : MonoBehaviour
 
 
 
-    public void ConfirmGridOccupation(string[] tagsToCheck)
+    public void ConfirmGridOccupation()
+
+
     {
+        string[] tagsToCheck = new string[] { "cube_child" };
+
         foreach (GridCell cell in gridCells)
         {
             GameObject gridUnitObject = cell.GridUnitObject;
@@ -272,16 +276,17 @@ public class Grid1 : MonoBehaviour
     }
     private void CheckAndColorFullRowsAxis(string axis, Vector3 halfCellSize)
     {
+        int axisLength = axis == "X" ? width : depth;
+
+        // Iterate over each row along the specified axis
         for (int y = 0; y < height; y++)
         {
             for (int z = 0; z < depth; z++)
             {
                 bool isRowFull = true;
+                List<GameObject> objectsToColor = new List<GameObject>(); // Store parent objects to change material
 
-               
-                List<GameObject> objectsToColor = new List<GameObject>(); // Store objects to change material
-
-                int axisLength = axis == "X" ? width : depth;
+                // Iterate over each cell in the current row along the specified axis
                 for (int i = 0; i < axisLength; i++)
                 {
                     int x = axis == "X" ? i : z;
@@ -289,29 +294,53 @@ public class Grid1 : MonoBehaviour
                     Vector3 cellCenter = CalculateCellCenter(x, y, zCoord);
                     Collider[] colliders = Physics.OverlapBox(cellCenter, halfCellSize, Quaternion.identity);
 
-                    bool foundChild = false;
-                    foreach (var collider in colliders)
+                    bool foundChildOrCubeChild = false;
+
+                    // Check if any cell in the row is empty
+                    if (colliders.Length == 0)
                     {
-                        if (collider.gameObject.CompareTag("child"))
+                        isRowFull = false;
+                        break; // No need to continue checking this row
+                    }
+
+                    // Check each collider in the cell
+                    foreach (Collider collider in colliders)
+                    {
+                        // Check for 'cube_child' within the cell and add its parent if it has the 'child' tag
+                        if (collider.gameObject.CompareTag("cube_child"))
                         {
-                            foundChild = true;
-                            objectsToColor.Add(collider.gameObject); // Add object to the list for changing material
-                            break; // Assuming one relevant child object per cell
+                            Transform parent = collider.transform.parent;
+                            if (parent != null && parent.CompareTag("test"))
+                            {
+                                foundChildOrCubeChild = true;
+                                if (!objectsToColor.Contains(parent.gameObject))
+                                {
+                                    objectsToColor.Add(parent.gameObject); // Add parent object to the list for changing material
+                                }
+                            }
+                        }
+                        // Directly check for 'child' tagged objects
+                        else if (collider.gameObject.CompareTag("child"))
+                        {
+                            foundChildOrCubeChild = true;
+                            if (!objectsToColor.Contains(collider.gameObject))
+                            {
+                                objectsToColor.Add(collider.gameObject); // Directly add to list for changing material
+                            }
                         }
                     }
 
-                    if (!foundChild)
+                    // If no child objects were found in the current cell, the row is not full
+                    if (!foundChildOrCubeChild)
                     {
                         isRowFull = false;
-                        break;
+                        break; // No need to continue checking this row
                     }
                 }
 
+                // If the row is full, change the material of all objects in the row
                 if (isRowFull)
                 {
-                    
-
-                    // Change materials of all objects in the full row
                     foreach (GameObject obj in objectsToColor)
                     {
                         Renderer renderer = obj.GetComponent<Renderer>();
@@ -320,12 +349,14 @@ public class Grid1 : MonoBehaviour
                             renderer.material = swapMaterial;
                         }
                     }
-                 
-                    Debug.Log($"Full row found along {axis}-axis at Y={y} and {(axis == "X" ? "Z=" + z : "X=" + z)}. Materials have been swapped.");
+
+                    Debug.Log($"Full row found along {axis}-axis at Y={y}. Materials have been swapped.");
                 }
             }
         }
     }
+
+
 
 
 
@@ -498,6 +529,64 @@ public class Grid1 : MonoBehaviour
             Debug.LogError("Boundary_Cube not found in the scene.");
         }
     }
+    public void AdjustAndReinitializeGrid()
+    {
+
+        GameObject boundaryCube = GameObject.Find("Boundary_Cube");
+        if (boundaryCube != null)
+        {
+            // Initialize grid size based on the initial scale of the boundary cube's BoxCollider
+           
+            InitializeGrid();
+        }
+
+
+        // Reinitialize the grid to reflect new dimensions
+
+    }
+    // Add to your existing class
+
+    public void ResizeGridAndBoundaryCube(float newWidth, float newHeight, float newDepth)
+    {
+        // Assuming newWidth, newHeight, and newDepth are the new sizes for the boundary cube
+        GameObject boundaryCube = GameObject.Find("Boundary_Cube");
+        if (boundaryCube != null)
+        {
+            // Update boundary cube scale - adjust this line based on how your game scales objects
+            boundaryCube.transform.localScale = new Vector3(newWidth, newHeight, newDepth);
+
+            // Update the grid dimensions if they are directly tied to the size of the boundary cube
+            UpdateGridSize(boundaryCube.GetComponent<BoxCollider>().size);
+
+            // Clear existing grid cells if necessary
+            
+
+            // Reinitialize the grid with new dimensions
+            InitializeGrid();
+        }
+        else
+        {
+            Debug.LogError("Boundary_Cube GameObject not found in the scene.");
+        }
+    }
+
+    private void ClearExistingGridCells()
+    {
+        GameObject boundaryCube = GameObject.Find("Boundary_Cube");
+        if (boundaryCube != null)
+        {
+            // Get a list of all child objects but not the boundary cube itself
+            List<GameObject> children = new List<GameObject>();
+            foreach (Transform child in boundaryCube.transform)
+            {
+                children.Add(child.gameObject);
+            }
+
+            // Destroy all child objects, which should be the grid cells
+            children.ForEach(child => Destroy(child));
+        }
+    }
+
 
 }
 

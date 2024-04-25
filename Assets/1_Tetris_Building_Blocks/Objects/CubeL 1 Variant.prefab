@@ -78,6 +78,12 @@ PrefabInstance:
       propertyPath: m_Name
       value: CubeL 1 Variant
       objectReference: {fileID: 0}
+    - target: {fileID: 8569825238426434430, guid: fa18d3950395eba4f97bd8034ab56ea7,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: -5495902117074765545, guid: 7f0ffa0d6e92f6547ade57f1d0f4ee8e,
+        type: 3}
     m_RemovedComponents:
     - {fileID: 1120657216701822413, guid: fa18d3950395eba4f97bd8034ab56ea7, type: 3}
     - {fileID: 8544690952010435577, guid: fa18d3950395eba4f97bd8034ab56ea7, type: 3}

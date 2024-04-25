@@ -17,9 +17,10 @@ public class SpawnScript : MonoBehaviour
     private Grid1 grid;
     public GameObject nextBlockObject; // Reference to the Next_Block object
     public RawImage nextBlockRawImage; // Reference to the RawImage component for preview in Next_Block
-
+  
     private GameObject nextPrefab; // Reference to the next cube prefab
 
+    
     void Start()
     {
         GameObject boundaryCube = GameObject.Find("Boundary_Cube");
@@ -31,7 +32,7 @@ public class SpawnScript : MonoBehaviour
             if (grid != null)
             {
                 PrePickNextBlock();
-                SpawnNewBlock();
+                
             }
             else
             {

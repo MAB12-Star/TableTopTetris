@@ -26,7 +26,8 @@ public class CubeMovement : MonoBehaviour
     private bool hasSpawnedTrigger = false; // Flag to track if a trigger has already been spawned
     private bool isNudgeMode = false;
     private AudioSource audioSource;
-    
+  
+
     void Start()
     {
         // Find and store the Grid1 instance
