@@ -16,6 +16,14 @@ public class Grid1 : MonoBehaviour
     private Vector3 gridUnitSize; // Size of each grid unit in world space
     GridUnit GridUnit;
 
+    /// <summary>
+    /// This is used to check for any object is inside a grid unit or not.
+    /// This divides the size of the grid unit to 1/4 so that
+    /// when detecting objects only those are consider which are inside it
+    /// and not on the borders of it.
+    /// </summary>
+    private const int gridSizeDividerForColorCheck = 4;
+
     void OnDrawGizmos()
     {
         GameObject boundaryCube = GameObject.Find("Boundary_Cube");
@@ -252,15 +260,15 @@ public class Grid1 : MonoBehaviour
     public int score = 0;
     public void IsGridUnitOccupied()
     {
-        Vector3 halfCellSize = new Vector3(gridUnitSize.x / 2, gridUnitSize.y / 2, gridUnitSize.z / 2);
+        Vector3 cellSizeToDetect = new Vector3(gridUnitSize.x / gridSizeDividerForColorCheck, gridUnitSize.y / gridSizeDividerForColorCheck, gridUnitSize.z / gridSizeDividerForColorCheck);
 
         // Check for full rows along the X-axis
-        CheckAndColorFullRowsAxis("X", halfCellSize);
+        CheckAndColorFullRowsAxis("X", cellSizeToDetect);
 
         // Check for full rows along the Z-axis
-        CheckAndColorFullRowsAxis("Z", halfCellSize);
+        CheckAndColorFullRowsAxis("Z", cellSizeToDetect);
 
-        CheckAndClearFullLayers(halfCellSize);
+        CheckAndClearFullLayers(cellSizeToDetect);
     }
 
     public void UpdateGridOccupancyStatus()
@@ -274,7 +282,7 @@ public class Grid1 : MonoBehaviour
             }
         }
     }
-    private void CheckAndColorFullRowsAxis(string axis, Vector3 halfCellSize)
+    private void CheckAndColorFullRowsAxis(string axis, Vector3 oneFourthOfCellSize)
     {
         int axisLength = axis == "X" ? width : depth;
 
@@ -292,7 +300,7 @@ public class Grid1 : MonoBehaviour
                     int x = axis == "X" ? i : z;
                     int zCoord = axis == "Z" ? i : z;
                     Vector3 cellCenter = CalculateCellCenter(x, y, zCoord);
-                    Collider[] colliders = Physics.OverlapBox(cellCenter, halfCellSize, Quaternion.identity);
+                    Collider[] colliders = Physics.OverlapBox(cellCenter, oneFourthOfCellSize, Quaternion.identity);
 
                     bool foundChildOrCubeChild = false;
 
