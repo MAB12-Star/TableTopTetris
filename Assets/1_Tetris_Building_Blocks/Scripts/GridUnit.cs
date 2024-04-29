@@ -11,7 +11,7 @@ public class GridUnit : MonoBehaviour
         set
         {
             isOccupied = value;
-           
+            Debug.Log("Grid unit isOccupied set to: " + isOccupied);
         }
     }
 
@@ -21,6 +21,7 @@ public class GridUnit : MonoBehaviour
         {
             
             IsOccupied = true;
+            Debug.Log("Grid unit entered by object with tag: " + other.tag);
         }
     }
 

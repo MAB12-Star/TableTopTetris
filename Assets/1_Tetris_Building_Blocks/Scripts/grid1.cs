@@ -402,7 +402,7 @@ public class Grid1 : MonoBehaviour
 
                     foreach (var collider in colliders)
                     {
-                        if (collider.gameObject.CompareTag("cube_child"))
+                        if (collider.gameObject.CompareTag("cube_child") || (collider.gameObject.CompareTag("child")))
                         {
                             foundChild = true;
                             GameObject parentObject = collider.transform.parent ? collider.transform.parent.gameObject : null;
