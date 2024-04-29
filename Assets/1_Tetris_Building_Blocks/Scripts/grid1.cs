@@ -318,7 +318,7 @@ public class Grid1 : MonoBehaviour
                         if (collider.gameObject.CompareTag("cube_child"))
                         {
                             Transform parent = collider.transform.parent;
-                            if (parent != null && parent.CompareTag("test"))
+                            if (parent != null && parent.CompareTag("child"))
                             {
                                 foundChildOrCubeChild = true;
                                 if (!objectsToColor.Contains(parent.gameObject))
@@ -402,7 +402,7 @@ public class Grid1 : MonoBehaviour
 
                     foreach (var collider in colliders)
                     {
-                        if (collider.gameObject.CompareTag("child"))
+                        if (collider.gameObject.CompareTag("cube_child"))
                         {
                             foundChild = true;
                             GameObject parentObject = collider.transform.parent ? collider.transform.parent.gameObject : null;
