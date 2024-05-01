@@ -24,6 +24,8 @@ public class Grid1 : MonoBehaviour
     /// </summary>
     private const int gridSizeDividerForColorCheck = 4;
 
+    [SerializeField] private TextMeshProUGUI scoreTextMeshPro;
+
     void OnDrawGizmos()
     {
         GameObject boundaryCube = GameObject.Find("Boundary_Cube");
@@ -372,15 +374,15 @@ public class Grid1 : MonoBehaviour
     private void UpdateScoreDisplay(int newScore)
     {
         // Find the ScoreUpdate UI component
-        TextMeshProUGUI scoreText = GameObject.Find("Next_Block/Canvas/Image/ScoreUpdate").GetComponent<TextMeshProUGUI>();
-        if (scoreText != null)
+        //TextMeshProUGUI scoreText = GameObject.Find("Next_Block/Canvas/Image/ScoreUpdate").GetComponent<TextMeshProUGUI>();
+        if (scoreTextMeshPro != null)
         {
             // Update the score display
-            scoreText.text = newScore.ToString();
+            scoreTextMeshPro.text = newScore.ToString();
         }
         else
         {
-            Debug.LogError("ScoreUpdate TextMeshProUGUI component not found.");
+            Debug.LogError("No refrence found for scoreTextMeshPro.Failed to update score!");
         }
     }
     private void CheckAndClearFullLayers(Vector3 halfCellSize)

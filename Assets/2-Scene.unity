@@ -36301,6 +36301,7 @@ MonoBehaviour:
   height: 20
   depth: 10
   prefab: {fileID: -927199367670048503, guid: 87d819734e5372b4fb95668d90eecca4, type: 3}
+  scoreTextMeshPro: {fileID: 280428126}
   swapMaterial: {fileID: 2100000, guid: 92831cd029882e24280b74ec5a2a78e2, type: 2}
   score: 0
 --- !u!1 &1506695757805769968
