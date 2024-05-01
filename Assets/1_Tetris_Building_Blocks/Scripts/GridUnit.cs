@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GridUnit : MonoBehaviour
@@ -6,6 +7,7 @@ public class GridUnit : MonoBehaviour
     [SerializeField] private bool isOccupied = false;
 
     private BoxCollider boxCollider;
+    private List<GameObject> objectsInsideCollider = new List<GameObject>();
 
     #region Properties
 
@@ -37,8 +39,9 @@ public class GridUnit : MonoBehaviour
     {
         if (other.CompareTag("cube_child") || (other.CompareTag("child")))
         {
+            ToggleObjectsInsideCollider(true, other.gameObject);
             
-            IsOccupied = true;
+            //IsOccupied = true;
             Debug.Log("Grid unit entered by object with tag: " + other.tag);
         }
     }
@@ -47,8 +50,9 @@ public class GridUnit : MonoBehaviour
     {
         if (other.CompareTag("cube_child") || (other.CompareTag("child")))
         {
+            ToggleObjectsInsideCollider(false, other.gameObject);
             
-            IsOccupied = false;
+            //IsOccupied = false;
         }
     }
 
@@ -71,7 +75,10 @@ public class GridUnit : MonoBehaviour
     }
     public void finalLayerCheckOccupancy()
     {
-        Vector3 sizeToDetectObjects = Vector3.zero;
+        RefreshListStatus();
+        //Below code commented as above code is now being used
+        //to refresh status if the grid is occupied.
+        /*Vector3 sizeToDetectObjects = Vector3.zero;
         if (BoxCollider)
         {
             sizeToDetectObjects = Vector3.Scale(BoxCollider.size, transform.lossyScale) / 2;
@@ -94,6 +101,51 @@ public class GridUnit : MonoBehaviour
             }
         }
         // No overlapping collider found, mark the grid unit as vacant
-        IsOccupied = false;
+        IsOccupied = false;*/
+    }
+
+    public void ToggleObjectsInsideCollider(bool toggle, GameObject gameObject)
+    {
+        if (objectsInsideCollider.Contains(gameObject))
+        {
+            if (!toggle)
+            {
+                objectsInsideCollider.Remove(gameObject);
+            }
+        }
+        else
+        {
+            if (toggle)
+            {
+                objectsInsideCollider.Add(gameObject);
+            }
+        }
+        RefreshListStatus();
+    }
+
+    public void RefreshListStatus()
+    {
+        ClearDeletedObjectsFromList();
+        UpdateOccupiedStatusFromList();
+    }
+
+    public void UpdateOccupiedStatusFromList()
+    {
+        IsOccupied = objectsInsideCollider.Count > 0;
+    }
+
+    private void ClearDeletedObjectsFromList()
+    {
+        for (int i = 0; i < objectsInsideCollider.Count;)
+        {
+            if (objectsInsideCollider[i] == null)
+            {
+                objectsInsideCollider.RemoveAt(i);
+            }
+            else
+            {
+                i++;
+            }
+        }
     }
 }
