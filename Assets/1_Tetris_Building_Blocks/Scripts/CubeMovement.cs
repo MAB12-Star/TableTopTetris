@@ -26,14 +26,15 @@ public class CubeMovement : MonoBehaviour
     private bool hasSpawnedTrigger = false; // Flag to track if a trigger has already been spawned
     private bool isNudgeMode = false;
     private AudioSource audioSource;
+    private AudioManager1 audioManager;
   
 
     void Start()
     {
         // Find and store the Grid1 instance
         grid = FindObjectOfType<Grid1>();
-        audioSource = GetComponent<AudioSource>();
-        AudioManager.instance.Play("BackgroundMusic");
+        //audioSource = GetComponent<AudioSource>();
+        //AudioManager.instance.Play("BackgroundMusic");
         // Check if grid is found
         if (grid == null)
         {
@@ -223,7 +224,10 @@ else
         if (OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger, OVRInput.Controller.LTouch))
         {
             rigidbody.useGravity = true;
+            AudioManager1.Instance.PlaySfx("cube_drop");
+
         }
+        
     }
 
 
@@ -408,11 +412,10 @@ else
                 rigidbody.useGravity = true;
                 float delayInSeconds = 2f;
                 StartCoroutine(HandleCollisionWithDelay(delayInSeconds));
-               if (audioSource != null && audioSource.clip != null)
-        {
-            // Play the sound
-            audioSource.Play();
-        }
+               
+                AudioManager1.Instance.PlaySfx("cube_collide");
+                
+
             }
 
             // Set the flag to true to indicate that collision has been handled
