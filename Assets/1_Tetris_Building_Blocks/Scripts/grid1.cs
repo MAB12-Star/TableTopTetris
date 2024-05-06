@@ -25,6 +25,7 @@ public class Grid1 : MonoBehaviour
     private const int gridSizeDividerForColorCheck = 4;
 
     [SerializeField] private TextMeshProUGUI scoreTextMeshPro;
+    [SerializeField] private TextMeshProUGUI levelTextMeshPro;
 
     void OnDrawGizmos()
     {
@@ -96,7 +97,10 @@ public class Grid1 : MonoBehaviour
             // Initialize grid size based on the initial scale of the boundary cube's BoxCollider
             UpdateGridSize(boundaryCube.GetComponent<BoxCollider>().size);
             InitializeGrid();
+            // Initialize the level display to show level 1
+            UpdateLevelDisplay(currentLevel);
         }
+
     }
 
     private void Update()
@@ -260,6 +264,7 @@ public class Grid1 : MonoBehaviour
 
     public Material swapMaterial;
     public int score = 0;
+    public int level = 1;
     public void IsGridUnitOccupied()
     {
         Vector3 cellSizeToDetect = new Vector3(gridUnitSize.x / gridSizeDividerForColorCheck, gridUnitSize.y / gridSizeDividerForColorCheck, gridUnitSize.z / gridSizeDividerForColorCheck);
@@ -367,24 +372,45 @@ public class Grid1 : MonoBehaviour
     }
 
 
-
-
-
+    private int currentLevel = 1;
+    private int scoreThreshold = 10;
 
     private void UpdateScoreDisplay(int newScore)
     {
-        // Find the ScoreUpdate UI component
-        //TextMeshProUGUI scoreText = GameObject.Find("Next_Block/Canvas/Image/ScoreUpdate").GetComponent<TextMeshProUGUI>();
         if (scoreTextMeshPro != null)
         {
             // Update the score display
             scoreTextMeshPro.text = newScore.ToString();
+
+            // Check if the new score meets the threshold for increasing the level
+            if (newScore >= currentLevel * scoreThreshold)
+            {
+                // Increase the level
+                currentLevel++;
+
+                // Update the level display
+                UpdateLevelDisplay(currentLevel);
+            }
         }
         else
         {
-            Debug.LogError("No refrence found for scoreTextMeshPro.Failed to update score!");
+            Debug.LogError("No reference found for scoreTextMeshPro. Failed to update score!");
         }
     }
+
+    private void UpdateLevelDisplay(int newLevel)
+    {
+        if (levelTextMeshPro != null)
+        {
+            // Update the level display
+            levelTextMeshPro.text = newLevel.ToString();
+        }
+        else
+        {
+            Debug.LogError("No reference found for levelTextMeshPro. Failed to update level!");
+        }
+    }
+
     private void CheckAndClearFullLayers(Vector3 halfCellSize)
     {
         for (int y = 0; y < height; y++)

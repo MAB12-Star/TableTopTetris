@@ -12,7 +12,8 @@ using UnityEngine.XR;
 
 public class CubeMovement : MonoBehaviour
 {
-    public float moveSpeed = .5f; // Adjust the move speed for grid-based movement
+    public float fallSpeed = .3f;
+    public float moveSpeed = 1; // Adjust the move speed for grid-based movement
     public float gridSize = 1f; // Size of each grid unit
     private bool canMove = true; // Flag to control movement
     private Vector3 lastJoystickInput = Vector3.zero; // Store the last joystick input
@@ -58,7 +59,7 @@ public class CubeMovement : MonoBehaviour
         if (rigidbody != null && spawnScript != null)
         {
             // Calculate the velocity based on the size of one grid unit
-            float velocityMagnitude = .3f; // Adjust as needed
+            float velocityMagnitude = fallSpeed; // Adjust as needed
             Vector3 gridUnitSize = new Vector3(1f, 1f, 1f); // Adjust as needed based on your grid size
 
             // Calculate the velocity vector based on the direction and magnitude
@@ -176,7 +177,7 @@ else
         return bounds;
     }
 
-
+    
 
 
     void Update()
