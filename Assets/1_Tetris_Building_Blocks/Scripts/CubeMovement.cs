@@ -28,7 +28,38 @@ public class CubeMovement : MonoBehaviour
     private bool isNudgeMode = false;
     private AudioSource audioSource;
     private AudioManager1 audioManager;
-  
+    
+    /// <summary>
+    /// This list contains all colliders tagged cube_child in this trasform
+    /// </summary>
+    private List<BoxCollider> boxColliders = new List<BoxCollider>();
+
+    public List<BoxCollider> BoxColliders
+    {
+        get
+        {
+            if (boxColliders == null)
+            {
+                boxColliders = new List<BoxCollider>();
+            }
+            if (boxColliders.Count < 1)
+            {
+                foreach (Transform child in transform)
+                {
+                    foreach (Transform grandChild in child)
+                    {
+                        BoxCollider bc = grandChild.GetComponent<BoxCollider>();
+                        if (bc != null)
+                        {
+                            boxColliders.Add(bc);
+                        }
+                    }
+                }
+            }
+            return boxColliders;
+        }
+    }
+
 
     void Start()
     {
@@ -187,6 +218,9 @@ else
         if (canMove)
         {
             Vector2 thumbstickInput = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick);
+#if UNITY_EDITOR
+            thumbstickInput = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+#endif
             float horizontalInput = thumbstickInput.x;
             float verticalInput = thumbstickInput.y;
             Vector3 joystickInput = new Vector3(Mathf.Round(horizontalInput), 0, Mathf.Round(verticalInput));
@@ -205,8 +239,7 @@ else
                 // Optionally, clamp newPosition within the boundary defined by the Boundary_Cube and grid dimensions
                 // newPosition = ClampPositionWithinBoundary(newPosition, boundaryCube.transform.position, grid);
 
-                transform.position = newPosition;
-                
+                ChangePosition(movement);
             }
 
             // Existing rotation and gravity code remains unchanged
@@ -218,6 +251,9 @@ else
     void HandleRotationAndGravity()
     {
         Vector2 rightThumbstickInput = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick);
+#if UNITY_EDITOR
+        rightThumbstickInput = new Vector2(Input.GetAxis("NewHorizontal"), Input.GetAxis("NewVertical"));
+#endif
         float rightStickHorizontal = rightThumbstickInput.x;
         float rightStickVertical = rightThumbstickInput.y;
 
@@ -263,12 +299,13 @@ else
             {
                 // Perform the rotation
                 Quaternion rotation = Quaternion.AngleAxis(angle, rotationAxis);
-                transform.rotation *= rotation;
-              
+                //transform.rotation *= rotation;
+
+                Rotate(rotation);
                 // Align the object to the grid after rotation
-                AlignParentObjectToGrid();
-                CheckAndAdjustBoundaries();
-              
+                //AlignParentObjectToGrid();
+                //CheckAndAdjustBoundaries();
+
 
                 // Prevent immediate re-rotation
                 canRotate = false;
@@ -317,8 +354,9 @@ else
     }
 
 
-    void AlignParentObjectToGrid()
+    Vector3 AlignParentObjectToGrid()
     {
+        Vector3 offset = Vector3.zero;
         GameObject boundaryCube = GameObject.Find("Boundary_Cube");
         if (boundaryCube != null)
         {
@@ -337,7 +375,7 @@ else
                 );
 
                 // Calculate and apply the offset needed to align the object within the grid
-                Vector3 offset = gridAlignedPosition - new Vector3(bounds.min.x, transform.position.y, bounds.min.z);
+                offset = gridAlignedPosition - new Vector3(bounds.min.x, transform.position.y, bounds.min.z);
                 transform.position += offset;
             }
             else
@@ -349,10 +387,8 @@ else
         {
             Debug.LogError("Boundary_Cube not found in the scene.");
         }
+        return offset;
     }
-
-
-
 
     void CheckAndAdjustBoundaries()
     {
@@ -529,13 +565,79 @@ else
 
     }
 
-
-
-
+    public void ChangePosition(Vector3 movement)
+    {
+        transform.position += movement;
+        if(!CanMove())
+        {
+            transform.position -= movement;
+        }
     }
 
+    public void Rotate(Quaternion newRotation)
+    {
+        transform.rotation *= newRotation;
 
+        Vector3 offset = AlignParentObjectToGrid();
+        CheckAndAdjustBoundaries();
 
+        if (!CanMove())
+        {
+            transform.position -= offset;
+            transform.rotation *= Quaternion.Inverse(newRotation);
+        }
+        CheckAndAdjustBoundaries();
+    }
+
+    /// <summary>
+    /// This method tells if the cube transform
+    /// can move in a direction.
+    /// Currently it does not takes any direction or rotation
+    /// As before calling this method we are already applying
+    /// a change(position/rotation) and reverts back this
+    /// returns falls.
+    /// </summary>
+    /// <returns></returns>
+    public bool CanMove()
+    {
+        bool objectFoundInWay = false;
+        
+        foreach (BoxCollider boxCollider in BoxColliders)
+        {
+            Vector3 size = Vector3.Scale(boxCollider.size, boxCollider.transform.lossyScale) / 2;
+            Collider[] colliders = Physics.OverlapBox(boxCollider.transform.position, size);
+
+            foreach (Collider collider in colliders)
+            {
+                if (collider.CompareTag(TagConstants.CubeChild))
+                {
+                    if (!IsDescendantCollider(collider.transform))
+                    {
+                        objectFoundInWay = true;
+                        break;
+                    }
+                }
+            }
+            if (objectFoundInWay)
+            {
+                break;
+            }
+        }
+        return !objectFoundInWay;
+    }
+
+    public bool IsDescendantCollider(Transform trans)
+    {
+        foreach (BoxCollider boxCollider in BoxColliders)
+        {
+            if (boxCollider.transform == trans)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+}
 
 
 
