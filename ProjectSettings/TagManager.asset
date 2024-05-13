@@ -10,6 +10,8 @@ TagManager:
   - child
   - cube_child
   - GridUnitCollider
+  - Test
+  - Brace
   layers:
   - Default
   - TransparentFX

@@ -20,23 +20,29 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 253419382219343717, guid: 1d4e1bdc6e421bf48851cbe06cd643f7,
         type: 3}
+      propertyPath: m_Icon
+      value: 
+      objectReference: {fileID: 5721338939258241955, guid: 0000000000000000d000000000000000,
+        type: 0}
+    - target: {fileID: 253419382219343717, guid: 1d4e1bdc6e421bf48851cbe06cd643f7,
+        type: 3}
       propertyPath: m_Name
       value: Cube (3) Variant1 1
       objectReference: {fileID: 0}
     - target: {fileID: 2297923885652274947, guid: 1d4e1bdc6e421bf48851cbe06cd643f7,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.1
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2297923885652274947, guid: 1d4e1bdc6e421bf48851cbe06cd643f7,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.1
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2297923885652274947, guid: 1d4e1bdc6e421bf48851cbe06cd643f7,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.1
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2297923885652274947, guid: 1d4e1bdc6e421bf48851cbe06cd643f7,
         type: 3}
@@ -179,7 +185,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1143edc2e41b2c478b44e586e92c153, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fallspeed: 0.3
+  fallSpeed: 0.3
   moveSpeed: 1
   gridSize: 1
   rotationCooldown: 0.2

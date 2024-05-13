@@ -78,6 +78,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: CubeL 1 Variant
       objectReference: {fileID: 0}
+    - target: {fileID: 4810410173395542765, guid: fa18d3950395eba4f97bd8034ab56ea7,
+        type: 3}
+      propertyPath: m_CollisionDetection
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8569825238426434430, guid: fa18d3950395eba4f97bd8034ab56ea7,
         type: 3}
       propertyPath: m_Mesh

@@ -208,17 +208,17 @@ PrefabInstance:
     - target: {fileID: 2297923885652274947, guid: 1d4e1bdc6e421bf48851cbe06cd643f7,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.1
+      value: 0.099
       objectReference: {fileID: 0}
     - target: {fileID: 2297923885652274947, guid: 1d4e1bdc6e421bf48851cbe06cd643f7,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.1
+      value: 0.099
       objectReference: {fileID: 0}
     - target: {fileID: 2297923885652274947, guid: 1d4e1bdc6e421bf48851cbe06cd643f7,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.1
+      value: 0.099
       objectReference: {fileID: 0}
     - target: {fileID: 2297923885652274947, guid: 1d4e1bdc6e421bf48851cbe06cd643f7,
         type: 3}
@@ -293,17 +293,22 @@ PrefabInstance:
     - target: {fileID: 8285907774118420004, guid: 1d4e1bdc6e421bf48851cbe06cd643f7,
         type: 3}
       propertyPath: m_Size.x
-      value: 1
+      value: 0.099
       objectReference: {fileID: 0}
     - target: {fileID: 8285907774118420004, guid: 1d4e1bdc6e421bf48851cbe06cd643f7,
         type: 3}
       propertyPath: m_Size.y
-      value: 1
+      value: 0.099
       objectReference: {fileID: 0}
     - target: {fileID: 8285907774118420004, guid: 1d4e1bdc6e421bf48851cbe06cd643f7,
         type: 3}
       propertyPath: m_Size.z
-      value: 1
+      value: 0.099
+      objectReference: {fileID: 0}
+    - target: {fileID: 8285907774118420004, guid: 1d4e1bdc6e421bf48851cbe06cd643f7,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8285907774118420004, guid: 1d4e1bdc6e421bf48851cbe06cd643f7,
         type: 3}
@@ -363,6 +368,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1143edc2e41b2c478b44e586e92c153, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fallSpeed: 0.3
   moveSpeed: 1
   gridSize: 1
   rotationCooldown: 0.2

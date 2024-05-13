@@ -15,6 +15,15 @@ public class Grid1 : MonoBehaviour
     private Vector3 lastBoundaryCubeSize;
     private Vector3 gridUnitSize; // Size of each grid unit in world space
     GridUnit GridUnit;
+    float originalTimeScale = 1.0f;
+    public Material swapMaterial;
+    public int score = 0;
+    public int level = 1;
+    public int currentLevel = 1;
+    private int scoreThreshold = 10;
+    private EncouragingWords encouragingWords;
+    
+
 
     /// <summary>
     /// This is used to check for any object is inside a grid unit or not.
@@ -26,6 +35,7 @@ public class Grid1 : MonoBehaviour
 
     [SerializeField] private TextMeshProUGUI scoreTextMeshPro;
     [SerializeField] private TextMeshProUGUI levelTextMeshPro;
+    [SerializeField] private TextMeshProUGUI youWinTextMeshPro;
 
     void OnDrawGizmos()
     {
@@ -101,6 +111,12 @@ public class Grid1 : MonoBehaviour
             UpdateLevelDisplay(currentLevel);
         }
 
+        encouragingWords = FindObjectOfType<EncouragingWords>();
+        if (encouragingWords == null)
+        {
+            Debug.LogError("EncouragingWords script not found!");
+        }
+
     }
 
     private void Update()
@@ -114,6 +130,7 @@ public class Grid1 : MonoBehaviour
         {
             Debug.LogError("Boundary_Cube GameObject not found in the scene.");
         }
+
     }
 
     private void UpdateGridSize(Vector3 colliderSize)
@@ -261,14 +278,12 @@ public class Grid1 : MonoBehaviour
         }
     }
 
-
-    public Material swapMaterial;
-    public int score = 0;
-    public int level = 1;
+    
     public void IsGridUnitOccupied()
     {
         Vector3 cellSizeToDetect = new Vector3(gridUnitSize.x / gridSizeDividerForColorCheck, gridUnitSize.y / gridSizeDividerForColorCheck, gridUnitSize.z / gridSizeDividerForColorCheck);
 
+      
         // Check for full rows along the X-axis
         CheckAndColorFullRowsAxis("X", cellSizeToDetect);
 
@@ -371,11 +386,11 @@ public class Grid1 : MonoBehaviour
         }
     }
 
+   
 
-    private int currentLevel = 1;
-    private int scoreThreshold = 10;
 
-    private void UpdateScoreDisplay(int newScore)
+
+    public void UpdateScoreDisplay(int newScore)
     {
         if (scoreTextMeshPro != null)
         {
@@ -387,9 +402,20 @@ public class Grid1 : MonoBehaviour
             {
                 // Increase the level
                 currentLevel++;
+                AudioManager1.Instance.PlayMusic("Theme2");
 
                 // Update the level display
                 UpdateLevelDisplay(currentLevel);
+
+                if (currentLevel == 5)
+                {
+                    youWinTextMeshPro.text = "You Win";
+                    Time.timeScale = 0f;
+                }
+                else
+                {
+                    StartCoroutine(DisplayEncouragingWordForDuration(3f));
+                }
             }
         }
         else
@@ -398,7 +424,19 @@ public class Grid1 : MonoBehaviour
         }
     }
 
-    private void UpdateLevelDisplay(int newLevel)
+    private IEnumerator DisplayEncouragingWordForDuration(float duration)
+    {
+        // Display encouraging word
+        encouragingWords.DisplayEncouragingWord();
+
+        // Wait for specified duration
+        yield return new WaitForSeconds(duration);
+
+        // Clear the encouraging word
+        encouragingWords.ClearText();
+    }
+
+    public void UpdateLevelDisplay(int newLevel)
     {
         if (levelTextMeshPro != null)
         {
@@ -457,10 +495,15 @@ public class Grid1 : MonoBehaviour
             {
                 score += 10; // Increase score for a full layer
                 UpdateScoreDisplay(score);
+                if (score % 10 == 0)
+                {
+                    // Calculate the number of increments
+                    int increments = score / 10;
 
-               
+                    // Increase time scale by 0.5 * increments
+                    Time.timeScale = 1.0f + (0.3f * increments);
+                }
 
-                
                 // Process and delete parents and their children
                 ProcessAndDeleteObjects(parentsToDelete, childObjectsToDelete);
                 
@@ -471,9 +514,54 @@ public class Grid1 : MonoBehaviour
         }
     }
 
+    /* private void ProcessAndDeleteObjects(HashSet<GameObject> parentsToDelete, List<GameObject> childObjectsToDelete)
+     {
+         foreach (GameObject parent in parentsToDelete)
+         {
+             // Get all components attached to the parent GameObject
+             Component[] components = parent.GetComponents<Component>();
+
+             // Loop through each component
+             foreach (Component component in components)
+             {
+                 // Skip Transform and MeshFilter components, as they should not be destroyed
+                 if (component is Transform || component is MeshFilter)
+                     continue;
+
+                 // Destroy the component
+                 Destroy(component);
+             }
+
+             // Destroy the parent GameObject
+             Destroy(parent);
+         }
+
+         // Delete the child objects
+         foreach (GameObject childObject in childObjectsToDelete)
+         {
+             // Get all components attached to the child GameObject
+             Component[] components = childObject.GetComponents<Component>();
+
+             // Loop through each component
+             foreach (Component component in components)
+             {
+                 // Skip Transform and MeshFilter components, as they should not be destroyed
+                 if (component is Transform || component is MeshFilter)
+                     continue;
+
+                 // Destroy the component
+                 Destroy(component);
+             }
+
+             // Destroy the child GameObject
+             Destroy(childObject);
+         }
+
+         UpdateGridOccupancyStatus();
+     }*/
     private void ProcessAndDeleteObjects(HashSet<GameObject> parentsToDelete, List<GameObject> childObjectsToDelete)
     {
-        
+
         foreach (GameObject parent in parentsToDelete)
         {
             foreach (Transform child in parent.transform)
@@ -482,7 +570,9 @@ public class Grid1 : MonoBehaviour
                 {
                     child.SetParent(null); // Unparent the child
                     AddOrUpdateRigidbody(child.gameObject);
+                   
                 }
+
             }
             Destroy(parent); // Delete the parent
         }
@@ -493,8 +583,20 @@ public class Grid1 : MonoBehaviour
             Destroy(childObject);
         }
         UpdateGridOccupancyStatus();
+        EnsureAllRigidbodiesHaveGravity();
     }
 
+    private void EnsureAllRigidbodiesHaveGravity()
+    {
+        Rigidbody[] allRigidbodies = FindObjectsOfType<Rigidbody>();
+        foreach (Rigidbody rb in allRigidbodies)
+        {
+            if (!rb.useGravity)
+            {
+                rb.useGravity = true; // Enforce gravity
+            }
+        }
+    }
     private void AddOrUpdateRigidbody(GameObject child)
     {   
         MeshCollider childMeshCollider = child.GetComponent<MeshCollider>();
@@ -531,6 +633,7 @@ public class Grid1 : MonoBehaviour
             {
                 // Retrieve the grid unit size from the Grid component
                 Vector3 gridSize = gridComponent.GetGridUnitSize();
+                Debug.Log($"Grid Size: {gridSize}");
 
                 Bounds bounds = new Bounds(transform.position, Vector3.zero);
                 foreach (Transform child in transform)
@@ -542,16 +645,21 @@ public class Grid1 : MonoBehaviour
                     }
                 }
 
-                // Assuming you want to align the object based on its bottom-left-back corner
+                Debug.Log($"Original Bounds Min: {bounds.min}");
+
+                // Align based on the bottom-left-back corner
                 Vector3 gridAlignedPosition = new Vector3(
-                    Mathf.Round(bounds.min.x / gridSize.x) * gridSize.x,
-                    Mathf.Round(bounds.min.y / gridSize.y) * gridSize.y,
-                    Mathf.Round(bounds.min.z / gridSize.z) * gridSize.z
+                    Mathf.Floor(bounds.min.x / gridSize.x) * gridSize.x,
+                    Mathf.Floor(bounds.min.y / gridSize.y) * gridSize.y,
+                    Mathf.Floor(bounds.min.z / gridSize.z) * gridSize.z
                 );
 
+                Debug.Log($"Calculated Grid-Aligned Position: {gridAlignedPosition}");
 
                 // Calculate the offset needed to align the bounds with the grid
                 Vector3 offset = gridAlignedPosition - bounds.min;
+                Debug.Log($"Offset to Apply: {offset}");
+
                 // Apply the offset to the parent object to align it with the grid
                 transform.position += offset;
             }
@@ -565,6 +673,7 @@ public class Grid1 : MonoBehaviour
             Debug.LogError("Boundary_Cube not found in the scene.");
         }
     }
+
     public void AdjustAndReinitializeGrid()
     {
 

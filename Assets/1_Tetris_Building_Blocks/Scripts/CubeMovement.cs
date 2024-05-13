@@ -28,7 +28,9 @@ public class CubeMovement : MonoBehaviour
     private bool isNudgeMode = false;
     private AudioSource audioSource;
     private AudioManager1 audioManager;
+
     
+
     /// <summary>
     /// This list contains all colliders tagged cube_child in this trasform
     /// </summary>
@@ -63,6 +65,7 @@ public class CubeMovement : MonoBehaviour
 
     void Start()
     {
+        
         // Find and store the Grid1 instance
         grid = FindObjectOfType<Grid1>();
         //audioSource = GetComponent<AudioSource>();
@@ -73,8 +76,9 @@ public class CubeMovement : MonoBehaviour
             Debug.LogError("Grid1 instance not found!");
             return;
         }
+      
 
-       
+
 
         // Now you can access gridSizeX from grid
         int gridSizeX = grid.width; // Assuming 'width' is the number of cells along the X-axis
@@ -262,6 +266,7 @@ else
         {
             rigidbody.useGravity = true;
             AudioManager1.Instance.PlaySfx("cube_drop");
+           
 
         }
         
@@ -326,16 +331,20 @@ else
                 case "CubeT":
                 case "CubeT(Clone)":
                 case "CubeT Variant(Clone)":
+                case "TT":
                     return new Vector3(2f, 3f, 1f);
                 case "Cube Rectangle":
                 case "Cube Rectangle(Clone)":
+                case "TC":
                     return new Vector3(1f, 3f, 1f);
                 case "CubeL":
                 case "CubeL(Clone)":
+                case "CL":
                     return new Vector3(2f, 3f, 1f);
                 case "Cube":
                 case "Cube(Clone)":
                 case "Cube3 Variant1(Clone)":
+                case "CC":
                     return new Vector3(1f, 1f, 1f);
                 // Add more cases for other objects as needed
                 default:
@@ -435,12 +444,12 @@ else
         return bounds;
     }
 
-
+   
     private bool hasCollided = false;
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (!hasCollided && (collision.gameObject.CompareTag("StoppingPlane") || (collision.gameObject.CompareTag("child")||(collision.gameObject.CompareTag("Cube") && collision.gameObject.layer != LayerMask.NameToLayer("CubeLayer")))))
+        if (!hasCollided && (collision.gameObject.CompareTag("StoppingPlane") || (collision.gameObject.CompareTag("child") || (collision.gameObject.CompareTag("cube_child") || (collision.gameObject.CompareTag("Cube") && collision.gameObject.layer != LayerMask.NameToLayer("CubeLayer"))))))
         {
            // Debug.Log("Object stopped at position: " + transform.position);
 
@@ -452,12 +461,16 @@ else
                
                 AudioManager1.Instance.PlaySfx("cube_collide");
                 
+               
+                
 
             }
 
             // Set the flag to true to indicate that collision has been handled
             hasCollided = true;
             
+
+
 
             // Debug.Log("After Collision - Position: " + transform.position);
             bool isAligned = CheckAlignment();
@@ -501,6 +514,8 @@ else
           
         }
     }
+
+   
 
     private bool CheckAlignment()
     {

@@ -11,12 +11,18 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/TetrisV4.unity
     guid: 6963c2ee3200e5c45be478be00fde312
-  - enabled: 1
+  - enabled: 0
     path: Assets/1-Scene.unity
     guid: f3583337dbd76b44a9dc108fab6b3178
   - enabled: 1
     path: Assets/2-Scene.unity
     guid: af6bd4811109f2249a0fdbbb1f0111e6
+  - enabled: 0
+    path: Assets/3-Scene.unity
+    guid: f05c2e9c48f692c4c920c46ad4e8889a
+  - enabled: 0
+    path: Assets/4-Scene.unity
+    guid: d0d36c57cbf47eb4997083cd39c87ca8
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: deb5a70fe5189f546a1e5bd8d80cfc5b,
       type: 2}
