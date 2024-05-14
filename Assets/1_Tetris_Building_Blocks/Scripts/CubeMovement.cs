@@ -223,7 +223,10 @@ else
         {
             Vector2 thumbstickInput = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick);
 #if UNITY_EDITOR
-            thumbstickInput = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+            if (!IsOVRControllerConnected())
+            {
+                thumbstickInput = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+            }
 #endif
             float horizontalInput = thumbstickInput.x;
             float verticalInput = thumbstickInput.y;
@@ -256,7 +259,10 @@ else
     {
         Vector2 rightThumbstickInput = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick);
 #if UNITY_EDITOR
-        rightThumbstickInput = new Vector2(Input.GetAxis("NewHorizontal"), Input.GetAxis("NewVertical"));
+        if (!IsOVRControllerConnected())
+        {
+            rightThumbstickInput = new Vector2(Input.GetAxis("NewHorizontal"), Input.GetAxis("NewVertical"));
+        }
 #endif
         float rightStickHorizontal = rightThumbstickInput.x;
         float rightStickVertical = rightThumbstickInput.y;
@@ -651,6 +657,11 @@ else
             }
         }
         return false;
+    }
+
+    public static bool IsOVRControllerConnected()
+    {
+        return OVRInput.IsControllerConnected(OVRInput.Controller.All);
     }
 }
 
