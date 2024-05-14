@@ -514,51 +514,7 @@ public class Grid1 : MonoBehaviour
         }
     }
 
-    /* private void ProcessAndDeleteObjects(HashSet<GameObject> parentsToDelete, List<GameObject> childObjectsToDelete)
-     {
-         foreach (GameObject parent in parentsToDelete)
-         {
-             // Get all components attached to the parent GameObject
-             Component[] components = parent.GetComponents<Component>();
-
-             // Loop through each component
-             foreach (Component component in components)
-             {
-                 // Skip Transform and MeshFilter components, as they should not be destroyed
-                 if (component is Transform || component is MeshFilter)
-                     continue;
-
-                 // Destroy the component
-                 Destroy(component);
-             }
-
-             // Destroy the parent GameObject
-             Destroy(parent);
-         }
-
-         // Delete the child objects
-         foreach (GameObject childObject in childObjectsToDelete)
-         {
-             // Get all components attached to the child GameObject
-             Component[] components = childObject.GetComponents<Component>();
-
-             // Loop through each component
-             foreach (Component component in components)
-             {
-                 // Skip Transform and MeshFilter components, as they should not be destroyed
-                 if (component is Transform || component is MeshFilter)
-                     continue;
-
-                 // Destroy the component
-                 Destroy(component);
-             }
-
-             // Destroy the child GameObject
-             Destroy(childObject);
-         }
-
-         UpdateGridOccupancyStatus();
-     }*/
+   
     private void ProcessAndDeleteObjects(HashSet<GameObject> parentsToDelete, List<GameObject> childObjectsToDelete)
     {
 

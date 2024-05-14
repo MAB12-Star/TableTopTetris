@@ -50,6 +50,8 @@ public class BoundaryWatcher : MonoBehaviour
                     Debug.Log("Game Over: A 'Cube' has crossed the y-axis boundary at " + yBoundary);
                     textMeshPro.text = "You Lose!"; // Display message
                     Time.timeScale = 0f; // Stop the game
+                    AudioManager1.Instance.StopMusic();
+
                     AudioManager1.Instance.PlayMusic("Theme4");
                     PauseMenu.SetActive(true);
                     break; // Exit loop after the first detection

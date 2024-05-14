@@ -68,7 +68,7 @@ public class AudioManager1 : MonoBehaviour
         }
         else if (Grid.currentLevel == 3)
         {
-            PlayMusic("Theme2");
+            PlayMusic("Theme5");
         }
         else if (Grid.currentLevel == 4)
         {

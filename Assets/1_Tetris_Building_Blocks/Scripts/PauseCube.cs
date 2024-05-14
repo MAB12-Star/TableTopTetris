@@ -4,7 +4,8 @@ using UnityEngine.SceneManagement;
 public class CubePause : MonoBehaviour
 {
     [SerializeField] GameObject PauseMenu;
-
+    [SerializeField] GameObject CloseInfo;
+       
 
     public void Pause()
     {
@@ -28,5 +29,13 @@ public class CubePause : MonoBehaviour
         Time.timeScale = 1f;
         SceneManager.LoadScene("1-Scene");
     }
+    public void Close()
+    {
+        // Set the time scale to 0 to pause the game
+        CloseInfo.SetActive(false);
+        
+    }
+
+
 }
 
