@@ -529,7 +529,7 @@ public class Grid1 : MonoBehaviour
 
                 if (child && !childObjectsToDelete.Contains(child.gameObject)) // If child is not being deleted
                 {
-                    child.SetParent(null); // Unparent the child
+                    child.SetParent(transform); // Change parent of the child to the grid.
                     AddOrUpdateRigidbody(child.gameObject);                
                 }
                 else
@@ -583,7 +583,7 @@ public class Grid1 : MonoBehaviour
         childRigidbody.useGravity = true;
         childRigidbody.constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ |
                                      RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ | RigidbodyConstraints.FreezeRotationY;
-        AlignParentObjectToGrid();
+        //AlignParentObjectToGrid();
         
     }
 
