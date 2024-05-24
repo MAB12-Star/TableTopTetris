@@ -9,7 +9,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{B0F0D6DB-1D20-03F3-AE04-D2F09BB446AC}</ProjectGuid>
+    <ProjectGuid>{B7AAE1EA-A095-B95A-B609-376EF92A435C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Assembly-CSharp</AssemblyName>
@@ -81,20 +81,24 @@
     <Compile Include="Assets\BoundaryWatcher.cs" />
     <Compile Include="Assets\OculusRayInteractor.cs" />
     <Compile Include="Assets\1_Tetris_Building_Blocks\Scripts\PauseCube.cs" />
+    <Compile Include="Assets\DeleteCeiling.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\CameraController.cs" />
     <Compile Include="Assets\1_Tetris_Building_Blocks\Scripts\MoveDown.cs" />
     <Compile Include="Assets\1_Tetris_Building_Blocks\Scripts\SpawnScript.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark03.cs" />
     <Compile Include="Assets\1_Tetris_Building_Blocks\Scripts\Data\Constants\TagConstants.cs" />
+    <Compile Include="Assets\1_Tetris_Building_Blocks\Scripts\DestroyBoard.cs" />
     <Compile Include="Assets\1_Tetris_Building_Blocks\Scripts\CubeMovement1.cs" />
     <Compile Include="Assets\1_Tetris_Building_Blocks\Scripts\SpawnScript1.cs" />
     <Compile Include="Assets\EncouragingWords.cs" />
+    <Compile Include="Assets\1_Tetris_Building_Blocks\Scripts\DeactivateButton.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_ExampleScript_01.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMPro_InstructionOverlay.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexShakeB.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\DropdownSample.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexColorCycler.cs" />
     <Compile Include="Assets\1_Tetris_Building_Blocks\Scripts\AudioManager1.cs" />
+    <Compile Include="Assets\DeactivatePrefab.cs" />
     <Compile Include="Assets\1_Tetris_Building_Blocks\Scripts\Sound.cs" />
     <Compile Include="Assets\1_Tetris_Building_Blocks\Scripts\grid1.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ObjectSpin.cs" />
@@ -129,6 +133,7 @@
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF SSD.shader" />
     <None Include="Assets\QuickOutline\Resources\Shaders\OutlineMask.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Surface-Mobile.shader" />
+    <None Include="Assets\1_Tetris_Building_Blocks\Material\Board.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Surface.shader" />
     <None Include="Assets\TextMesh Pro\Sprites\EmojiOne Attribution.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap-Custom-Atlas.shader" />
@@ -1093,11 +1098,11 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Oculus.AvatarSDK2.Samples.Editor.csproj">
-      <Project>{050075C0-802A-4F1A-1ABE-22A5619A81BD}</Project>
+      <Project>{FF551964-7CC2-9450-FADE-025AE27487EC}</Project>
       <Name>Oculus.AvatarSDK2.Samples.Editor</Name>
     </ProjectReference>
     <ProjectReference Include="Oculus.AvatarSDK2.Samples.csproj">
-      <Project>{A2CB45F1-75EC-0847-F122-9CA20E312AB2}</Project>
+      <Project>{1F4CA115-3A2E-B391-1FA9-82393AB98D74}</Project>
       <Name>Oculus.AvatarSDK2.Samples</Name>
     </ProjectReference>
   </ItemGroup>

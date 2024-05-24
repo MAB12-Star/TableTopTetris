@@ -71,7 +71,7 @@ public class SpawnScript : MonoBehaviour
         // This assumes the grid's width and depth are centered around the Boundary_Cube's position
         Vector3 spawnPosition = new Vector3(
             boundaryCube.transform.position.x + (boundaryCube.transform.localScale.x / grid.width) * 0.5f, // Dynamically adjust based on Boundary_Cube's width and grid size
-            boundaryCube.transform.position.y + (boundaryCube.GetComponent<BoxCollider>().size.y / 2.0f),
+            boundaryCube.transform.position.y + (boundaryCube.GetComponent<BoxCollider>().size.y / 1.0f),
             boundaryCube.transform.position.z + (boundaryCube.transform.localScale.z / grid.depth) * 0.5f // Dynamically adjust based on Boundary_Cube's depth and grid size
         );
         if (nextPrefab != null)

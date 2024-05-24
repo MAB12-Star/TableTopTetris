@@ -5,7 +5,8 @@ public class CubePause : MonoBehaviour
 {
     [SerializeField] GameObject PauseMenu;
     [SerializeField] GameObject CloseInfo;
-       
+
+
 
     public void Pause()
     {
@@ -35,6 +36,8 @@ public class CubePause : MonoBehaviour
         CloseInfo.SetActive(false);
         
     }
+
+
 
 
 }

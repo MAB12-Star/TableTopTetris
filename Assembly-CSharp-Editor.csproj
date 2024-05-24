@@ -9,7 +9,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{F472F4C8-DF5E-92A1-C2CB-B6734FAD3F74}</ProjectGuid>
+    <ProjectGuid>{EF35F73A-3DE8-B0D5-22A7-A3CCC781A3B1}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Assembly-CSharp-Editor</AssemblyName>
@@ -315,6 +315,9 @@
     </Reference>
     <Reference Include="UnityEditor.Graphs">
       <HintPath>C:\Program Files\Unity\Hub\Editor\2022.3.7f1\Editor\Data\Managed\UnityEditor.Graphs.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.WebGL.Extensions">
+      <HintPath>C:\Program Files\Unity\Hub\Editor\2022.3.7f1\Editor\Data\PlaybackEngines\WebGLSupport\UnityEditor.WebGL.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.Android.Extensions">
       <HintPath>C:\Program Files\Unity\Hub\Editor\2022.3.7f1\Editor\Data\PlaybackEngines\AndroidPlayer\UnityEditor.Android.Extensions.dll</HintPath>
@@ -1063,15 +1066,15 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Assembly-CSharp.csproj">
-      <Project>{B0F0D6DB-1D20-03F3-AE04-D2F09BB446AC}</Project>
+      <Project>{B7AAE1EA-A095-B95A-B609-376EF92A435C}</Project>
       <Name>Assembly-CSharp</Name>
     </ProjectReference>
     <ProjectReference Include="Oculus.AvatarSDK2.Samples.Editor.csproj">
-      <Project>{050075C0-802A-4F1A-1ABE-22A5619A81BD}</Project>
+      <Project>{FF551964-7CC2-9450-FADE-025AE27487EC}</Project>
       <Name>Oculus.AvatarSDK2.Samples.Editor</Name>
     </ProjectReference>
     <ProjectReference Include="Oculus.AvatarSDK2.Samples.csproj">
-      <Project>{A2CB45F1-75EC-0847-F122-9CA20E312AB2}</Project>
+      <Project>{1F4CA115-3A2E-B391-1FA9-82393AB98D74}</Project>
       <Name>Oculus.AvatarSDK2.Samples</Name>
     </ProjectReference>
   </ItemGroup>

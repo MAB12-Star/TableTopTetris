@@ -468,10 +468,7 @@ public class Grid1 : MonoBehaviour
 
                     foreach (var collider in colliders)
                     {
-                        //Commented the code so that we check collider of 
-                        //the indiviual blocks which are bigger in size Required only
-                        //as we remove the parent of that child later.
-                        if (/*collider.gameObject.CompareTag("cube_child") ||*/ (collider.gameObject.CompareTag("child")))
+                        if (collider.gameObject.CompareTag("cube_child") || (collider.gameObject.CompareTag("child")))
                         {
                             foundChild = true;
                             GameObject parentObject = collider.transform.parent ? collider.transform.parent.gameObject : null;
@@ -523,18 +520,13 @@ public class Grid1 : MonoBehaviour
 
         foreach (GameObject parent in parentsToDelete)
         {
-            for (int i = 0;i < parent.transform.childCount;)
+            foreach (Transform child in parent.transform)
             {
-                Transform child = parent.transform.GetChild(i);
-
-                if (child && !childObjectsToDelete.Contains(child.gameObject)) // If child is not being deleted
+                if (!childObjectsToDelete.Contains(child.gameObject)) // If child is not being deleted
                 {
-                    child.SetParent(transform); // Change parent of the child to the grid.
-                    AddOrUpdateRigidbody(child.gameObject);                
-                }
-                else
-                {
-                    ++i;
+                    child.SetParent(null); // Unparent the child
+                    AddOrUpdateRigidbody(child.gameObject);
+                   
                 }
 
             }
@@ -583,7 +575,7 @@ public class Grid1 : MonoBehaviour
         childRigidbody.useGravity = true;
         childRigidbody.constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ |
                                      RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ | RigidbodyConstraints.FreezeRotationY;
-        //AlignParentObjectToGrid();
+        AlignParentObjectToGrid();
         
     }
 

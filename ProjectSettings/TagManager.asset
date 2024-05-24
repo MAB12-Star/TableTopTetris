@@ -12,11 +12,13 @@ TagManager:
   - GridUnitCollider
   - Test
   - Brace
+  - Ignore
+  - Delete
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Ignore
   - Water
   - UI
   - 
