@@ -105,7 +105,13 @@ public class Grid1 : MonoBehaviour
         if (boundaryCube != null)
         {
             // Initialize grid size based on the initial scale of the boundary cube's BoxCollider
-            UpdateGridSize(boundaryCube.GetComponent<BoxCollider>().size);
+
+
+            Vector3 NewGridSize = boundaryCube.GetComponent<BoxCollider>().size;
+            Vector3 boundaryScale = boundaryCube.transform.localScale;
+            NewGridSize = new Vector3(NewGridSize.x * boundaryScale.x, NewGridSize.y * boundaryScale.y, NewGridSize.z * boundaryScale.z);
+
+            UpdateGridSize(NewGridSize);
             InitializeGrid();
             // Initialize the level display to show level 1
             UpdateLevelDisplay(currentLevel);
@@ -657,7 +663,12 @@ public class Grid1 : MonoBehaviour
             boundaryCube.transform.localScale = new Vector3(newWidth, newHeight, newDepth);
 
             // Update the grid dimensions if they are directly tied to the size of the boundary cube
-            UpdateGridSize(boundaryCube.GetComponent<BoxCollider>().size);
+
+            Vector3 NewGridSize = boundaryCube.GetComponent<BoxCollider>().size;
+
+            NewGridSize = new Vector3(NewGridSize.x * newWidth, NewGridSize.y * newHeight, NewGridSize.z * newDepth);
+
+            UpdateGridSize(NewGridSize);
 
             // Clear existing grid cells if necessary
             
