@@ -14,6 +14,7 @@ public class Grid1 : MonoBehaviour
     public GameObject prefab;
     private Vector3 lastBoundaryCubeSize;
     private Vector3 gridUnitSize; // Size of each grid unit in world space
+    public Vector3 newgridUnitSize; // Size of each grid unit in world space
     GridUnit GridUnit;
     float originalTimeScale = 1.0f;
     public Material swapMaterial;
@@ -22,8 +23,8 @@ public class Grid1 : MonoBehaviour
     public int currentLevel = 1;
     private int scoreThreshold = 10;
     private EncouragingWords encouragingWords;
-    
 
+    private Transform parentTransform;
 
     /// <summary>
     /// This is used to check for any object is inside a grid unit or not.
@@ -95,7 +96,16 @@ public class Grid1 : MonoBehaviour
 
     public Vector3 GetGridUnitSize()
     {
-        return gridUnitSize;
+        Vector3 parentScale = parentTransform.localScale;
+        newgridUnitSize = new Vector3(GetTwoDecimalNumber(gridUnitSize.x, parentScale.x), GetTwoDecimalNumber(gridUnitSize.y, parentScale.y), 
+            GetTwoDecimalNumber(gridUnitSize.z, parentScale.z));
+        return newgridUnitSize;
+        //return gridUnitSize;
+    }
+
+    private float GetTwoDecimalNumber(float number1, float number2)
+    {
+        return number1 * number2;
     }
 
     private void Start()
@@ -109,13 +119,17 @@ public class Grid1 : MonoBehaviour
 
             Vector3 NewGridSize = boundaryCube.GetComponent<BoxCollider>().size;
             Vector3 boundaryScale = boundaryCube.transform.localScale;
-            NewGridSize = new Vector3(NewGridSize.x * boundaryScale.x, NewGridSize.y * boundaryScale.y, NewGridSize.z * boundaryScale.z);
+            //NewGridSize = new Vector3(NewGridSize.x * boundaryScale.x, NewGridSize.y * boundaryScale.y, NewGridSize.z * boundaryScale.z);
 
             UpdateGridSize(NewGridSize);
             InitializeGrid();
             // Initialize the level display to show level 1
             UpdateLevelDisplay(currentLevel);
         }
+
+        var obj = GetComponentInParent<DestroyBoard>();
+
+        parentTransform = obj.transform;
 
         encouragingWords = FindObjectOfType<EncouragingWords>();
         if (encouragingWords == null)
@@ -664,9 +678,10 @@ public class Grid1 : MonoBehaviour
 
             // Update the grid dimensions if they are directly tied to the size of the boundary cube
 
-            Vector3 NewGridSize = boundaryCube.GetComponent<BoxCollider>().size;
+            Vector3 NewGridSize = boundaryCube.transform.parent.GetComponent<BoxCollider>().size;
 
-            NewGridSize = new Vector3(NewGridSize.x * newWidth, NewGridSize.y * newHeight, NewGridSize.z * newDepth);
+            //NewGridSize = new Vector3(NewGridSize.x * newWidth, NewGridSize.y * newHeight, NewGridSize.z * newDepth);
+            NewGridSize = new Vector3(newWidth, newHeight, newDepth);
 
             UpdateGridSize(NewGridSize);
 
