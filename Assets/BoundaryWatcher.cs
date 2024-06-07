@@ -45,7 +45,7 @@ public class BoundaryWatcher : MonoBehaviour
                 }
 
                 // Check if the cube has been above the boundary for more than 5 seconds
-                if (cubeTimer[cube] >= 5.0f)
+                if (cubeTimer[cube] >= 10.0f)
                 {
                     Debug.Log("Game Over: A 'Cube' has crossed the y-axis boundary at " + yBoundary);
                     textMeshPro.text = "You Lose!"; // Display message

@@ -14,7 +14,6 @@ public class Grid1 : MonoBehaviour
     public GameObject prefab;
     private Vector3 lastBoundaryCubeSize;
     private Vector3 gridUnitSize; // Size of each grid unit in world space
-    public Vector3 newgridUnitSize; // Size of each grid unit in world space
     GridUnit GridUnit;
     float originalTimeScale = 1.0f;
     public Material swapMaterial;
@@ -23,8 +22,8 @@ public class Grid1 : MonoBehaviour
     public int currentLevel = 1;
     private int scoreThreshold = 10;
     private EncouragingWords encouragingWords;
+    
 
-    private Transform parentTransform;
 
     /// <summary>
     /// This is used to check for any object is inside a grid unit or not.
@@ -39,105 +38,116 @@ public class Grid1 : MonoBehaviour
     [SerializeField] private TextMeshProUGUI youWinTextMeshPro;
 
     void OnDrawGizmos()
+{
+    GameObject boundaryCube = GameObject.Find("Boundary_Cube");
+    if (boundaryCube != null)
     {
-        GameObject boundaryCube = GameObject.Find("Boundary_Cube");
-        if (boundaryCube != null)
+        Gizmos.color = Color.yellow;
+
+        // Assuming gridSize represents the number of cells along each dimension
+        int gridSizeX = width;  // Assuming 'width' is the number of cells along the X-axis
+        int gridSizeY = height; // Assuming 'height' is the number of cells along the Y-axis
+        int gridSizeZ = depth;  // Assuming 'depth' is the number of cells along the Z-axis
+
+        Vector3 objectScale = boundaryCube.transform.localScale;
+
+        // Calculate cell size based on boundary cube size and grid size
+        float cellSizeX = objectScale.x / gridSizeX;
+        float cellSizeY = (objectScale.y * 2) / gridSizeY; // Adjusted for the Y-axis
+        float cellSizeZ = objectScale.z / gridSizeZ;
+
+        Vector3 startPosition = boundaryCube.transform.position - new Vector3(objectScale.x / 2, objectScale.y, objectScale.z / 2); // Bottom left back corner adjusted for Y
+
+        // Draw grid lines along X-axis
+        for (int x = 0; x <= gridSizeX; x++)
         {
-            Gizmos.color = Color.yellow;
-
-            // Assuming gridSize represents the number of cells along each dimension
-            int gridSizeX = width;  // Assuming 'width' is the number of cells along the X-axis
-            int gridSizeY = height; // Assuming 'height' is the number of cells along the Y-axis
-            int gridSizeZ = depth;  // Assuming 'depth' is the number of cells along the Z-axis
-
-            Vector3 objectScale = boundaryCube.GetComponent<BoxCollider>().size;
-
-            // Calculate cell size based on boundary cube size and grid size
-            float cellSizeX = objectScale.x / gridSizeX;
-            float cellSizeY = objectScale.y / gridSizeY;
-            float cellSizeZ = objectScale.z / gridSizeZ;
-
-            Vector3 startPosition = boundaryCube.transform.position - objectScale / 2; // Bottom left back corner
-
-            // Draw grid lines along X-axis
-            for (int x = 0; x <= gridSizeX; x++)
-            {
-                for (int y = 0; y <= gridSizeY; y++)
-                {
-                    Vector3 start = startPosition + new Vector3(x * cellSizeX, y * cellSizeY, 0);
-                    Vector3 end = start + new Vector3(0, 0, objectScale.z);
-                    Gizmos.DrawLine(start, end);
-                }
-            }
-
-            // Draw grid lines along Y-axis
             for (int y = 0; y <= gridSizeY; y++)
             {
-                for (int z = 0; z <= gridSizeZ; z++)
-                {
-                    Vector3 start = startPosition + new Vector3(0, y * cellSizeY, z * cellSizeZ);
-                    Vector3 end = start + new Vector3(objectScale.x, 0, 0);
-                    Gizmos.DrawLine(start, end);
-                }
+                Vector3 start = startPosition + new Vector3(x * cellSizeX, y * cellSizeY, 0);
+                Vector3 end = start + new Vector3(0, 0, objectScale.z);
+                Gizmos.DrawLine(start, end);
             }
+        }
 
-            // Draw grid lines along Z-axis
+        // Draw grid lines along Y-axis
+        for (int y = 0; y <= gridSizeY; y++)
+        {
             for (int z = 0; z <= gridSizeZ; z++)
             {
-                for (int x = 0; x <= gridSizeX; x++)
-                {
-                    Vector3 start = startPosition + new Vector3(x * cellSizeX, 0, z * cellSizeZ);
-                    Vector3 end = start + new Vector3(0, objectScale.y, 0);
-                    Gizmos.DrawLine(start, end);
-                }
+                Vector3 start = startPosition + new Vector3(0, y * cellSizeY, z * cellSizeZ);
+                Vector3 end = start + new Vector3(objectScale.x, 0, 0);
+                Gizmos.DrawLine(start, end);
+            }
+        }
+
+        // Draw grid lines along Z-axis
+        for (int z = 0; z <= gridSizeZ; z++)
+        {
+            for (int x = 0; x <= gridSizeX; x++)
+            {
+                Vector3 start = startPosition + new Vector3(x * cellSizeX, 0, z * cellSizeZ);
+                Vector3 end = start + new Vector3(0, objectScale.y * 2, 0); // Adjusted for the Y-axis
+                Gizmos.DrawLine(start, end);
             }
         }
     }
+}
+
 
     public Vector3 GetGridUnitSize()
     {
-        Vector3 parentScale = parentTransform.localScale;
-        newgridUnitSize = new Vector3(GetTwoDecimalNumber(gridUnitSize.x, parentScale.x), GetTwoDecimalNumber(gridUnitSize.y, parentScale.y), 
-            GetTwoDecimalNumber(gridUnitSize.z, parentScale.z));
-        return newgridUnitSize;
-        //return gridUnitSize;
-    }
-
-    private float GetTwoDecimalNumber(float number1, float number2)
-    {
-        return number1 * number2;
-    }
-
-    private void Start()
-    {   
-        
+        // Assuming the boundary cube's transform represents the bounds of the grid
         GameObject boundaryCube = GameObject.Find("Boundary_Cube");
         if (boundaryCube != null)
         {
-            // Initialize grid size based on the initial scale of the boundary cube's BoxCollider
+            // Get the Grid component on Boundary_Cube
+            Grid1 grid = boundaryCube.GetComponent<Grid1>();
+            if (grid != null)
+            {
+                // Calculate the size of one unit in each axis based on the grid dimensions
+                Vector3 gridSize = new Vector3(grid.width, grid.height, grid.depth);
+                Vector3 scale = boundaryCube.transform.localScale;
+                return new Vector3(scale.x / gridSize.x, (scale.y*2) / gridSize.y, scale.z / gridSize.z);
+            }
+            else
+            {
+                Debug.LogError("Grid component not found on Boundary_Cube.");
+            }
+        }
+        else
+        {
+            Debug.LogError("Boundary_Cube not found in the scene.");
+        }
+
+        // Return a default unit size if grid information is not available
+        return Vector3.one;
+    }
 
 
-            Vector3 NewGridSize = boundaryCube.GetComponent<BoxCollider>().size;
-            Vector3 boundaryScale = boundaryCube.transform.localScale;
-            //NewGridSize = new Vector3(NewGridSize.x * boundaryScale.x, NewGridSize.y * boundaryScale.y, NewGridSize.z * boundaryScale.z);
 
-            UpdateGridSize(NewGridSize);
+
+
+
+
+    private void Start()
+    {
+        GameObject boundaryCube = GameObject.Find("Boundary_Cube");
+        if (boundaryCube != null)
+        {
+            // Initialize grid size based on the boundary cube's transform scale
+            UpdateGridSize(boundaryCube.transform.localScale);
             InitializeGrid();
             // Initialize the level display to show level 1
             UpdateLevelDisplay(currentLevel);
         }
-
-        var obj = GetComponentInParent<DestroyBoard>();
-
-        parentTransform = obj.transform;
 
         encouragingWords = FindObjectOfType<EncouragingWords>();
         if (encouragingWords == null)
         {
             Debug.LogError("EncouragingWords script not found!");
         }
-
     }
+
 
     private void Update()
     {
@@ -145,6 +155,7 @@ public class Grid1 : MonoBehaviour
         if (boundaryCube != null)
         {
             lastBoundaryCubeSize = boundaryCube.transform.localScale;
+            
         }
         else
         {
@@ -153,14 +164,15 @@ public class Grid1 : MonoBehaviour
 
     }
 
-    private void UpdateGridSize(Vector3 colliderSize)
+    private void UpdateGridSize(Vector3 transformScale)
     {
-        // Calculate the size of each grid unit to fit the scaled object
-        gridUnitSize = new Vector3(colliderSize.x / width, colliderSize.y / height, colliderSize.z / depth);
+        // Calculate the size of each grid unit to fit the scaled object, with height doubled
+        gridUnitSize = new Vector3(transformScale.x / width, (transformScale.y * 2) / height, transformScale.z / depth);
 
         // No need to change width, height, and depth here
         Debug.Log($"Grid unit size updated: {gridUnitSize}");
     }
+
 
     public class GridCell
     {
@@ -188,6 +200,7 @@ public class Grid1 : MonoBehaviour
         }
 
         float colliderOffset = 0.02f; // Offset value for collider size
+        float colliderCenterYOffset = 0.0f; // Offset for collider center on the Y-axis
 
         gridCells = new GridCell[width, height, depth]; // Initialize the table array
         Debug.Log("Grid Dimensions: " + width + " x " + height + " x " + depth);
@@ -211,21 +224,18 @@ public class Grid1 : MonoBehaviour
 
                     // Set collider size slightly smaller than the grid unit size
                     collider.size = new Vector3(gridUnitSize.x - colliderOffset, gridUnitSize.y - colliderOffset, gridUnitSize.z - colliderOffset);
+                    collider.center = new Vector3(0, colliderCenterYOffset, 0); // Adjust collider center
+
                     collider.isTrigger = true; // Set box collider as trigger
 
                     // Set the tag for the grid unit collider
                     gridUnit.tag = "GridUnitCollider";
-
-                    // Set the layer to GridInteraction
-                    //collider.gameObject.layer = LayerMask.NameToLayer("GridInteraction");
 
                     gridUnit.transform.position = position;
                     gridUnit.name = $"{x}_{y}_{z}";
 
                     // Create a new GridCell instance and assign the grid unit object to it
                     gridCells[x, y, z] = new GridCell(gridUnitSize) { GridUnitObject = gridUnit }; // Modified line
-
-                    // Set boundaryCube as the parent of gridUnit
 
                     // Set boundaryCube as the parent of gridUnit
                     gridUnit.transform.parent = boundaryCube.transform;
@@ -236,18 +246,19 @@ public class Grid1 : MonoBehaviour
             }
         }
         // Debug information to verify grid initialization
-      /*  Debug.Log("Grid initialized. Contents of gridCells array:");
-        for (int x = 0; x < width; x++)
-        {
-            for (int y = 0; y < height; y++)
-            {
-                for (int z = 0; z < depth; z++)
-                {
-                    Debug.Log($"GridCell at ({x}, {y}, {z}): {gridCells[x, y, z].GridUnitObject.name}");
-                }
-            }
-        }*/
+        /*  Debug.Log("Grid initialized. Contents of gridCells array:");
+          for (int x = 0; x < width; x++)
+          {
+              for (int y = 0; y < height; y++)
+              {
+                  for (int z = 0; z < depth; z++)
+                  {
+                      Debug.Log($"GridCell at ({x}, {y}, {z}): {gridCells[x, y, z].GridUnitObject.name}");
+                  }
+              }
+          }*/
     }
+
 
     public Vector3 CalculateCellCenter(int x, int y, int z)
     {
@@ -257,7 +268,7 @@ public class Grid1 : MonoBehaviour
             Vector3 objectScale = boundaryCube.GetComponent<BoxCollider>().size;
             Vector3 startPosition = boundaryCube.transform.position - objectScale / 2; // Bottom left back corner
             float cellSizeX = objectScale.x / width;
-            float cellSizeY = objectScale.y / height;
+            float cellSizeY = (objectScale.y) /height; 
             float cellSizeZ = objectScale.z / depth;
             return startPosition + new Vector3(x * cellSizeX + cellSizeX / 2f, y * cellSizeY + cellSizeY / 2f, z * cellSizeZ + cellSizeZ / 2f);
         }
@@ -267,6 +278,7 @@ public class Grid1 : MonoBehaviour
             return Vector3.zero;
         }
     }
+
 
 
 
@@ -298,20 +310,27 @@ public class Grid1 : MonoBehaviour
         }
     }
 
-    
+
     public void IsGridUnitOccupied()
     {
+        // Get the current grid unit size
+        Vector3 gridUnitSize = GetGridUnitSize();
+
+        // Calculate the size to detect objects within a cell
         Vector3 cellSizeToDetect = new Vector3(gridUnitSize.x / gridSizeDividerForColorCheck, gridUnitSize.y / gridSizeDividerForColorCheck, gridUnitSize.z / gridSizeDividerForColorCheck);
 
-      
         // Check for full rows along the X-axis
         CheckAndColorFullRowsAxis("X", cellSizeToDetect);
 
         // Check for full rows along the Z-axis
         CheckAndColorFullRowsAxis("Z", cellSizeToDetect);
 
+ 
+
+        // Check and clear full layers
         CheckAndClearFullLayers(cellSizeToDetect);
     }
+
 
     public void UpdateGridOccupancyStatus()
     {
@@ -341,8 +360,17 @@ public class Grid1 : MonoBehaviour
                 {
                     int x = axis == "X" ? i : z;
                     int zCoord = axis == "Z" ? i : z;
-                    Vector3 cellCenter = CalculateCellCenter(x, y, zCoord);
-                    Collider[] colliders = Physics.OverlapBox(cellCenter, oneFourthOfCellSize, Quaternion.identity);
+
+                    // Access the grid cell directly
+                    GridCell cell = gridCells[x, y, zCoord];
+                    if (cell == null || !cell.GridUnitObject.GetComponent<GridUnit>().IsOccupied)
+                    {
+                        isRowFull = false;
+                        break; // No need to continue checking this row
+                    }
+
+                    GameObject gridUnitObject = cell.GridUnitObject;
+                    Collider[] colliders = Physics.OverlapBox(gridUnitObject.transform.position, oneFourthOfCellSize, Quaternion.identity);
 
                     bool foundChildOrCubeChild = false;
 
@@ -402,11 +430,16 @@ public class Grid1 : MonoBehaviour
 
                     Debug.Log($"Full row found along {axis}-axis at Y={y}. Materials have been swapped.");
                 }
+                else
+                {
+                    Debug.Log($"Row is not full at Y={y} along {axis}-axis.");
+                }
             }
         }
     }
 
-   
+
+
 
 
 
@@ -482,8 +515,15 @@ public class Grid1 : MonoBehaviour
             {
                 for (int z = 0; z < depth; z++)
                 {
-                    Vector3 cellCenter = CalculateCellCenter(x, y, z);
-                    Collider[] colliders = Physics.OverlapBox(cellCenter, halfCellSize, Quaternion.identity);
+                    GridCell cell = gridCells[x, y, z];
+                    if (cell == null || !cell.GridUnitObject.GetComponent<GridUnit>().IsOccupied)
+                    {
+                        isLayerFull = false; // This cell is not occupied, layer is not full
+                        break; // No need to check further cells in this layer
+                    }
+
+                    GameObject gridUnitObject = cell.GridUnitObject;
+                    Collider[] colliders = Physics.OverlapBox(gridUnitObject.transform.position, halfCellSize, Quaternion.identity);
                     bool foundChild = false;
 
                     foreach (var collider in colliders)
@@ -526,15 +566,20 @@ public class Grid1 : MonoBehaviour
 
                 // Process and delete parents and their children
                 ProcessAndDeleteObjects(parentsToDelete, childObjectsToDelete);
-                
+
                 Debug.Log($"Full layer found at Y={y}. Score updated, parents and children processed.");
                 // If you want to check and clear only the first full layer found, uncomment the next line
                 // break;
             }
+            else
+            {
+                Debug.Log($"Layer is not full at Y={y}.");
+            }
         }
     }
 
-   
+
+
     private void ProcessAndDeleteObjects(HashSet<GameObject> parentsToDelete, List<GameObject> childObjectsToDelete)
     {
 
@@ -677,13 +722,7 @@ public class Grid1 : MonoBehaviour
             boundaryCube.transform.localScale = new Vector3(newWidth, newHeight, newDepth);
 
             // Update the grid dimensions if they are directly tied to the size of the boundary cube
-
-            Vector3 NewGridSize = boundaryCube.transform.parent.GetComponent<BoxCollider>().size;
-
-            //NewGridSize = new Vector3(NewGridSize.x * newWidth, NewGridSize.y * newHeight, NewGridSize.z * newDepth);
-            NewGridSize = new Vector3(newWidth, newHeight, newDepth);
-
-            UpdateGridSize(NewGridSize);
+            UpdateGridSize(boundaryCube.GetComponent<BoxCollider>().size);
 
             // Clear existing grid cells if necessary
             

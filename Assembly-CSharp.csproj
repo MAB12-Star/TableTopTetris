@@ -9,7 +9,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{B7AAE1EA-A095-B95A-B609-376EF92A435C}</ProjectGuid>
+    <ProjectGuid>{B0F0D6DB-1D20-03F3-AE04-D2F09BB446AC}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Assembly-CSharp</AssemblyName>
@@ -1098,11 +1098,11 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Oculus.AvatarSDK2.Samples.Editor.csproj">
-      <Project>{FF551964-7CC2-9450-FADE-025AE27487EC}</Project>
+      <Project>{050075C0-802A-4F1A-1ABE-22A5619A81BD}</Project>
       <Name>Oculus.AvatarSDK2.Samples.Editor</Name>
     </ProjectReference>
     <ProjectReference Include="Oculus.AvatarSDK2.Samples.csproj">
-      <Project>{1F4CA115-3A2E-B391-1FA9-82393AB98D74}</Project>
+      <Project>{A2CB45F1-75EC-0847-F122-9CA20E312AB2}</Project>
       <Name>Oculus.AvatarSDK2.Samples</Name>
     </ProjectReference>
   </ItemGroup>

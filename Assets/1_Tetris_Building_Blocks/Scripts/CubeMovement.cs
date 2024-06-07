@@ -12,7 +12,7 @@ using UnityEngine.XR;
 
 public class CubeMovement : MonoBehaviour
 {
-    public float fallSpeed = .3f;
+    public float fallSpeed = .1f;
     public float moveSpeed = 1; // Adjust the move speed for grid-based movement
     public float gridSize = 1f; // Size of each grid unit
     private bool canMove = true; // Flag to control movement
