@@ -14,6 +14,7 @@ public class Grid1 : MonoBehaviour
     public GameObject prefab;
     private Vector3 lastBoundaryCubeSize;
     private Vector3 gridUnitSize; // Size of each grid unit in world space
+
     GridUnit GridUnit;
     float originalTimeScale = 1.0f;
     public Material swapMaterial;
@@ -22,6 +23,7 @@ public class Grid1 : MonoBehaviour
     public int currentLevel = 1;
     private int scoreThreshold = 10;
     private EncouragingWords encouragingWords;
+    
     
 
 
@@ -136,6 +138,10 @@ public class Grid1 : MonoBehaviour
         {
             // Initialize grid size based on the boundary cube's transform scale
             UpdateGridSize(boundaryCube.transform.localScale);
+            Quaternion rotation = GameObject.Find("Boundary_Cube").transform.rotation;
+
+            // Update the grid rotation
+           
             InitializeGrid();
             // Initialize the level display to show level 1
             UpdateLevelDisplay(currentLevel);
@@ -155,7 +161,7 @@ public class Grid1 : MonoBehaviour
         if (boundaryCube != null)
         {
             lastBoundaryCubeSize = boundaryCube.transform.localScale;
-            
+            UpdateGridRotation(boundaryCube.transform.rotation);
         }
         else
         {
@@ -173,6 +179,13 @@ public class Grid1 : MonoBehaviour
         Debug.Log($"Grid unit size updated: {gridUnitSize}");
     }
 
+    public void UpdateGridRotation(Quaternion rotation)
+    {
+        // Update the grid rotation based on the provided rotation
+        transform.rotation = rotation;
+
+        // Update other aspects of the grid if needed...
+    }
 
     public class GridCell
     {

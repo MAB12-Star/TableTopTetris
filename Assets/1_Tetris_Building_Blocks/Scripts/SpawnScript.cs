@@ -46,56 +46,56 @@ public class SpawnScript : MonoBehaviour
     }
 
    
-    public void SpawnNewBlock()
+   public void SpawnNewBlock()
+{
+    if (cubePrefabsWithPreview == null || cubePrefabsWithPreview.Length == 0)
     {
-        if (cubePrefabsWithPreview == null || cubePrefabsWithPreview.Length == 0)
-        {
-            Debug.LogError("No cube prefabs assigned to the spawner.");
-            return;
-        }
-
-        GameObject boundaryCube = GameObject.Find("Boundary_Cube");
-        if (boundaryCube == null)
-        {
-            Debug.LogError("Boundary_Cube not found in the scene.");
-            return;
-        }
-        Grid1 grid = boundaryCube.GetComponent<Grid1>();
-        if (grid == null)
-        {
-            Debug.LogError("Grid component not found on Boundary_Cube.");
-            return;
-        }
-
-        // Calculate the spawn position at the top center of the grid
-        // This assumes the grid's width and depth are centered around the Boundary_Cube's position
-        Vector3 spawnPosition = new Vector3(
-            boundaryCube.transform.position.x + (boundaryCube.transform.localScale.x / grid.width) * 0.5f, // Dynamically adjust based on Boundary_Cube's width and grid size
-            boundaryCube.transform.position.y + (boundaryCube.GetComponent<BoxCollider>().size.y / 1.0f),
-            boundaryCube.transform.position.z + (boundaryCube.transform.localScale.z / grid.depth) * 0.5f // Dynamically adjust based on Boundary_Cube's depth and grid size
-        );
-        if (nextPrefab != null)
-        {
-            Debug.Log("Next prefab name: " + nextPrefab.name); // Check the name of the next prefab
-            if (nextPrefab.name == "CubeT Variant" || nextPrefab.name == "CubeL"|| nextPrefab.name == "CubeT Variant 1" || nextPrefab.name == "CubeL 1")
-            {
-                spawnPosition.x += 0.15f; // Add an offset of 0.15 on the X axis
-            }
-        
+        Debug.LogError("No cube prefabs assigned to the spawner.");
+        return;
     }
-        else
-        {
-            Debug.LogWarning("Next prefab is null.");
-        }
 
-        // Instantiate the pre-picked cube prefab at the calculated position
-        // Parent it under the Boundary_Cube to maintain a clean hierarchy and ensure it moves with the Boundary_Cube if needed
-        Instantiate(nextPrefab, spawnPosition, Quaternion.identity, boundaryCube.transform);
-
-        // Pre-pick the next block for the next spawn
-        PrePickNextBlock();
-        UpdatePreviewImage();
+    GameObject boundaryCube = GameObject.Find("Boundary_Cube");
+    if (boundaryCube == null)
+    {
+        Debug.LogError("Boundary_Cube not found in the scene.");
+        return;
     }
+    Grid1 grid = boundaryCube.GetComponent<Grid1>();
+    if (grid == null)
+    {
+        Debug.LogError("Grid component not found on Boundary_Cube.");
+        return;
+    }
+
+    // Calculate the spawn position at the top center of the grid
+    // This assumes the grid's width and depth are centered around the Boundary_Cube's position
+    Vector3 spawnPosition = new Vector3(
+        boundaryCube.transform.position.x + (boundaryCube.transform.localScale.x / grid.width) * 0.5f, // Dynamically adjust based on Boundary_Cube's width and grid size
+        boundaryCube.transform.position.y + (boundaryCube.GetComponent<BoxCollider>().size.y / 1.0f),
+        boundaryCube.transform.position.z + (boundaryCube.transform.localScale.z / grid.depth) * 0.5f // Dynamically adjust based on Boundary_Cube's depth and grid size
+    );
+
+    if (nextPrefab != null)
+    {
+        Debug.Log("Next prefab name: " + nextPrefab.name); // Check the name of the next prefab
+        if (nextPrefab.name == "CubeT Variant" || nextPrefab.name == "CubeL"|| nextPrefab.name == "CubeT Variant 1" || nextPrefab.name == "CubeL 1")
+        {
+            spawnPosition.x += 0.15f; // Add an offset of 0.15 on the X axis
+        }
+    }
+    else
+    {
+        Debug.LogWarning("Next prefab is null.");
+    }
+
+    // Instantiate the pre-picked cube prefab at the calculated position with the same rotation as the Boundary_Cube
+    GameObject newBlock = Instantiate(nextPrefab, spawnPosition, boundaryCube.transform.rotation, boundaryCube.transform);
+
+    // Pre-pick the next block for the next spawn
+    PrePickNextBlock();
+    UpdatePreviewImage();
+}
+
 
     private void PrePickNextBlock()
     {

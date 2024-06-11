@@ -37,10 +37,10 @@ public class AudioManager1 : MonoBehaviour
         {
             PlayMusic("Theme1");
         }
-        else if (currentSceneName == "2-Scene")
+       /* else if (currentSceneName == "2-Scene")
         {
             PlayMusic("Theme3");
-        }
+        }*/
     }
 
     private void Update()
