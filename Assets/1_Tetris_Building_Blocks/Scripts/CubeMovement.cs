@@ -4,15 +4,11 @@ using System.Collections;
 using Unity.VisualScripting;
 using System.Linq;
 using System.Collections.Generic;
-
 using UnityEngine.XR;
-
-
-
 
 public class CubeMovement : MonoBehaviour
 {
-    public float fallSpeed = .1f;
+    public float _fallSpeed = 0.1f;
     public float moveSpeed = 1; // Adjust the move speed for grid-based movement
     public float gridSize = 1f; // Size of each grid unit
     private bool canMove = true; // Flag to control movement
@@ -28,8 +24,6 @@ public class CubeMovement : MonoBehaviour
     private bool isNudgeMode = false;
     private AudioSource audioSource;
     private AudioManager1 audioManager;
-
-    
 
     /// <summary>
     /// This list contains all colliders tagged cube_child in this trasform
@@ -62,14 +56,14 @@ public class CubeMovement : MonoBehaviour
         }
     }
 
-
     void Start()
-    {
-        
+    {   
         // Find and store the Grid1 instance
         grid = FindObjectOfType<Grid1>();
+
         //audioSource = GetComponent<AudioSource>();
         //AudioManager.instance.Play("BackgroundMusic");
+        
         // Check if grid is found
         if (grid == null)
         {
@@ -77,14 +71,10 @@ public class CubeMovement : MonoBehaviour
             return;
         }
       
-
-
-
         // Now you can access gridSizeX from grid
         int gridSizeX = grid.width; // Assuming 'width' is the number of cells along the X-axis
         int gridSizeY = grid.height; // Assuming 'height' is the number of cells along the Y-axis
         int gridSizeZ = grid.depth;
-
 
         initialRotation = transform.rotation;
 
@@ -94,7 +84,7 @@ public class CubeMovement : MonoBehaviour
         if (rigidbody != null && spawnScript != null)
         {
             // Calculate the velocity based on the size of one grid unit
-            float velocityMagnitude = fallSpeed; // Adjust as needed
+            float velocityMagnitude = _fallSpeed; // Adjust as needed
             Vector3 gridUnitSize = new Vector3(1f, 1f, 1f); // Adjust as needed based on your grid size
 
             // Calculate the velocity vector based on the direction and magnitude
@@ -106,49 +96,31 @@ public class CubeMovement : MonoBehaviour
         {
             Debug.LogError("Rigidbody or SpawnScript not found. Please check your setup.");
         }
+
         // Find the Boundary_Cube GameObject
         GameObject boundaryCube = GameObject.Find("Boundary_Cube");
 
         if (boundaryCube != null)
-{
-    // Get the Grid component on Boundary_Cube
-    grid = boundaryCube.GetComponent<Grid1>();
-
-    if (grid != null)
-    {
-        boundaryCubeSizeX = grid.width;
-        boundaryCubeSizeY = grid.height;
-        boundaryCubeSizeZ = grid.depth;
-    }
-    else
-    {
-        Debug.LogError("Grid component not found on Boundary_Cube.");
-    }
-}
-else
-{
-    Debug.LogError("Boundary_Cube not found in the scene.");
-}
-      
-
-    }
-
-    
-    private Vector3 GetCurrentGridScale()
-    {
-        GameObject boundaryCube = GameObject.Find("Boundary_Cube");
-        if (boundaryCube != null)
         {
-            // Assuming the boundary cube's scale represents the total physical size of the grid
-            // and you want to maintain 10 units regardless of actual size,
-            // calculate how large one "unit" of movement should be in each direction.
-            Vector3 scale = boundaryCube.transform.localScale;
-            return new Vector3(scale.x / 10, scale.y / 20, scale.z / 10); // Adjust Y if necessary
-        }
-        return Vector3.one; // Default to 1x1x1 if boundary cube not found
-    }
+            // Get the Grid component on Boundary_Cube
+            grid = boundaryCube.GetComponent<Grid1>();
 
-  
+            if (grid != null)
+            {
+                boundaryCubeSizeX = grid.width;
+                boundaryCubeSizeY = grid.height;
+                boundaryCubeSizeZ = grid.depth;
+            }
+            else
+            {
+                Debug.LogError("Grid component not found on Boundary_Cube.");
+            }
+        }
+        else
+        {
+            Debug.LogError("Boundary_Cube not found in the scene.");
+        }
+    }
 
     void EnsureObjectsWithinGrid()
     {
@@ -212,13 +184,8 @@ else
         return bounds;
     }
 
-    
-
-
     void Update()
     {
-        EnsureObjectsWithinGrid();
-
         if (canMove)
         {
             Vector2 thumbstickInput = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick);
@@ -229,7 +196,7 @@ else
             float verticalInput = thumbstickInput.y;
             Vector3 joystickInput = new Vector3(Mathf.Round(horizontalInput), 0, Mathf.Round(verticalInput));
 
-            if (joystickInput != lastJoystickInput && joystickInput != Vector3.zero)
+            if (joystickInput != Vector3.zero && canMoveCooldown)
             {
                 // Access the grid unit size from Grid1 component
                 GameObject boundaryCube = GameObject.Find("Boundary_Cube");
@@ -244,48 +211,49 @@ else
                 // newPosition = ClampPositionWithinBoundary(newPosition, boundaryCube.transform.position, grid);
 
                 ChangePosition(movement);
+
+                canMoveCooldown = false;
+                StartCoroutine(MovementCooldownRoutine());
             }
 
             // Existing rotation and gravity code remains unchanged
             HandleRotationAndGravity();
             lastJoystickInput = joystickInput;
         }
+
+        EnsureObjectsWithinGrid();
     }
 
     void HandleRotationAndGravity()
     {
         Vector2 rightThumbstickInput = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick);
 #if UNITY_EDITOR
-        rightThumbstickInput = new Vector2(Input.GetAxis("NewHorizontal"), Input.GetAxis("NewVertical"));
+        rightThumbstickInput = new Vector2(Input.GetAxis("RotateHorizontal"), Input.GetAxis("NewVertical"));
 #endif
         float rightStickHorizontal = rightThumbstickInput.x;
         float rightStickVertical = rightThumbstickInput.y;
 
         RotateCubeByAxis(rightStickHorizontal, rightStickVertical);
+
         if (OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger, OVRInput.Controller.LTouch))
         {
             rigidbody.useGravity = true;
             AudioManager1.Instance.PlaySfx("cube_drop");
-           
-
         }
-        
     }
 
-
-
-    private bool canRotate = true;
+    private bool canRotateCooldown = true;
+    private bool canMoveCooldown = true;
     private Vector3 savedPosition;
     private bool rotationOccurred = false;
-    public float rotationCooldown = 0.2f; // Adjust the cooldown time as needed
+    public float _rotationCooldown = 0.25f; // Adjust the cooldown time as needed
+    public float _movementCooldown = 0.25f; // Adjust the cooldown time as needed
     private Vector3 lastRotatedSize; // New variable to store the rotated size
     private Vector3 objectSize;
-    // CubeMovement.cs
-    // ...
 
     private void RotateCubeByAxis(float horizontal, float vertical)
     {
-        if (canRotate && (Mathf.Abs(horizontal) > 0.1f || Mathf.Abs(vertical) > 0.1f)) // Ensure there's significant input
+        if (canRotateCooldown && (Mathf.Abs(horizontal) > 0.1f || Mathf.Abs(vertical) > 0.1f)) // Ensure there's significant input
         {
             Vector3 rotationAxis = Vector3.zero;
             float angle = 90f; // Fixed rotation angle
@@ -313,14 +281,12 @@ else
 
 
                 // Prevent immediate re-rotation
-                canRotate = false;
+                canRotateCooldown = false;
                 StartCoroutine(RotationCooldownRoutine());
             }
         }
-
     }
 
-    
     public class ObjectSizeConstants : MonoBehaviour
     {
         // Define constants for object sizes
@@ -355,13 +321,17 @@ else
         }
     }
 
-
     IEnumerator RotationCooldownRoutine()
     {
-        yield return new WaitForSeconds(rotationCooldown);
-        canRotate = true;
+        yield return new WaitForSeconds(_rotationCooldown);
+        canRotateCooldown = true;
     }
 
+    IEnumerator MovementCooldownRoutine()
+    {
+        yield return new WaitForSeconds(_movementCooldown);
+        canMoveCooldown = true;
+    }
 
     Vector3 AlignParentObjectToGrid()
     {
@@ -380,8 +350,7 @@ else
                 Vector3 gridAlignedPosition = new Vector3(
                     Mathf.Round((bounds.min.x - boundaryCube.transform.position.x) / gridSize.x) * gridSize.x + boundaryCube.transform.position.x,
                     bounds.min.y, // Assuming y-axis alignment isn't needed; adjust if necessary
-                    Mathf.Round((bounds.min.z - boundaryCube.transform.position.z) / gridSize.z) * gridSize.z + boundaryCube.transform.position.z
-                );
+                    Mathf.Round((bounds.min.z - boundaryCube.transform.position.z) / gridSize.z) * gridSize.z + boundaryCube.transform.position.z);
 
                 // Calculate and apply the offset needed to align the object within the grid
                 offset = gridAlignedPosition - new Vector3(bounds.min.x, transform.position.y, bounds.min.z);
@@ -444,7 +413,6 @@ else
         return bounds;
     }
 
-   
     private bool hasCollided = false;
 
     private void OnCollisionEnter(Collision collision)
@@ -458,20 +426,13 @@ else
                 rigidbody.useGravity = true;
                 float delayInSeconds = 2f;
                 StartCoroutine(HandleCollisionWithDelay(delayInSeconds));
-               
-                AudioManager1.Instance.PlaySfx("cube_collide");
-                
-               
-                
 
+                AudioManager1.Instance.PlaySfx("cube_collide");
             }
 
             // Set the flag to true to indicate that collision has been handled
             hasCollided = true;
             
-
-
-
             // Debug.Log("After Collision - Position: " + transform.position);
             bool isAligned = CheckAlignment();
 
@@ -487,9 +448,7 @@ else
 
                 // Debug.Log("Child position: " + childPosition);
                 // Debug.Log("Child alignment: X-" + alignedX + ", Z-" + alignedZ);
-
-
-                
+                                               
                 if (!alignedX || !alignedZ)
                 {
                     isAligned = false;
@@ -497,8 +456,6 @@ else
 
                 }
             }
-           
-
 
             if (!isAligned)
             {
@@ -506,16 +463,12 @@ else
                 AlignParentObjectToGrid();
 
                 // Optionally, enable nudge mode for manual adjustments if automatic alignment isn't perfect
-              
+
                 // Prevent normal movement while adjusting
                 Debug.Log("Misalignment detected. Attempting automatic alignment. Nudge mode enabled for manual adjustment if needed.");
-            }
-           
-          
+            }  
         }
     }
-
-   
 
     private bool CheckAlignment()
     {
@@ -543,8 +496,6 @@ else
         // If all children are aligned, return true
         return true;
     }
-
-
 
     private IEnumerator HandleCollisionWithDelay(float delay)
     {
@@ -584,7 +535,6 @@ else
         }
 
         // grid.ConfirmGridOccupation(new string[] { "Cube", "child", "cube_child" });
-
     }
 
     public void ChangePosition(Vector3 movement)
@@ -660,12 +610,3 @@ else
         return false;
     }
 }
-
-
-
-
-
-
-
-
-

@@ -41,6 +41,8 @@ public class AudioManager1 : MonoBehaviour
         {
             PlayMusic("Theme3");
         }
+
+        StartCoroutine(FindGridRoutine());
     }
 
     private void Update()
@@ -61,18 +63,21 @@ public class AudioManager1 : MonoBehaviour
             }
         }
 
-        // Check if the current level is 2
-        if (Grid.currentLevel == 2)
+        if (Grid != null)
         {
-            PlayMusic("Theme4");
-        }
-        else if (Grid.currentLevel == 3)
-        {
-            PlayMusic("Theme5");
-        }
-        else if (Grid.currentLevel == 4)
-        {
-            PlayMusic("Theme5");
+            // Check if the current level is 2
+            if (Grid.currentLevel == 2)
+            {
+                PlayMusic("Theme4");
+            }
+            else if (Grid.currentLevel == 3)
+            {
+                PlayMusic("Theme5");
+            }
+            else if (Grid.currentLevel == 4)
+            {
+                PlayMusic("Theme5");
+            }
         }
     }
     public void PlayMusic(string name)
@@ -112,6 +117,24 @@ public class AudioManager1 : MonoBehaviour
         if (musicSource.isPlaying)
         {
             musicSource.Stop();
+        }
+    }
+
+    private IEnumerator FindGridRoutine()
+    {
+        while (Grid == null)
+        {
+            Grid = FindObjectOfType<Grid1>();
+            if (Grid != null)
+            {
+                Debug.Log("Grid1 object found!");
+                yield break; // Exit the coroutine once the object is found
+            }
+            else
+            {
+                Debug.Log("Grid1 object not found. Trying again in 2 seconds...");
+            }
+            yield return new WaitForSeconds(2f); // Wait for 2 seconds before trying again
         }
     }
 }
