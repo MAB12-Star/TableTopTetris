@@ -28,8 +28,8 @@ public class CubeMovement : MonoBehaviour
     private bool isNudgeMode = false;
     private AudioSource audioSource;
     private AudioManager1 audioManager;
-
-    
+    private TrailRenderer trailRenderer;
+   
 
     /// <summary>
     /// This list contains all colliders tagged cube_child in this trasform
@@ -76,9 +76,10 @@ public class CubeMovement : MonoBehaviour
             Debug.LogError("Grid1 instance not found!");
             return;
         }
-      
 
 
+        rigidbody = GetComponent<Rigidbody>();
+       
 
         // Now you can access gridSizeX from grid
         int gridSizeX = grid.width; // Assuming 'width' is the number of cells along the X-axis
@@ -212,8 +213,24 @@ else
         return bounds;
     }
 
-    
 
+    public void SetKinematic(bool isKinematic)
+    {
+        if (rigidbody != null)
+        {
+            rigidbody.isKinematic = isKinematic;
+        }
+    }
+
+    public void EnableGravity(bool enable)
+    {
+        if (rigidbody != null)
+        {
+            rigidbody.useGravity = enable;
+           
+
+        }
+    }
 
     void Update()
     {
@@ -236,8 +253,10 @@ else
                 Grid1 grid = boundaryCube.GetComponent<Grid1>();
                 Vector3 gridUnitSize = grid.GetGridUnitSize();
 
+                Vector3 localJoystickInput = boundaryCube.transform.TransformDirection(joystickInput);
+
                 // Calculate movement distance based on grid unit size and joystick input
-                Vector3 movement = new Vector3(joystickInput.x * gridUnitSize.x, 0, joystickInput.z * gridUnitSize.z) * moveSpeed;
+                Vector3 movement = new Vector3(localJoystickInput.x * gridUnitSize.x, 0, localJoystickInput.z * gridUnitSize.z) * moveSpeed;
                 Vector3 newPosition = transform.position + movement;
 
                 // Optionally, clamp newPosition within the boundary defined by the Boundary_Cube and grid dimensions
@@ -266,11 +285,15 @@ else
         {
             rigidbody.useGravity = true;
             AudioManager1.Instance.PlaySfx("cube_drop");
+
            
 
+            
         }
         
     }
+
+   
 
 
 
@@ -373,18 +396,24 @@ else
             if (gridComponent != null)
             {
                 Vector3 gridSize = gridComponent.GetGridUnitSize();
-
                 Bounds bounds = CalculateCombinedBounds(); // Use your existing method to calculate bounds
 
-                // Adjust for grid alignment, using grid unit size
-                Vector3 gridAlignedPosition = new Vector3(
-                    Mathf.Round((bounds.min.x - boundaryCube.transform.position.x) / gridSize.x) * gridSize.x + boundaryCube.transform.position.x,
-                    bounds.min.y, // Assuming y-axis alignment isn't needed; adjust if necessary
-                    Mathf.Round((bounds.min.z - boundaryCube.transform.position.z) / gridSize.z) * gridSize.z + boundaryCube.transform.position.z
+                // Transform bounds center to local space of the boundary cube
+                Vector3 localBoundsMin = boundaryCube.transform.InverseTransformPoint(bounds.min);
+                Vector3 localBoundsCenter = boundaryCube.transform.InverseTransformPoint(bounds.center);
+
+                // Adjust for grid alignment in local space, using grid unit size
+                Vector3 localGridAlignedPosition = new Vector3(
+                    Mathf.Round(localBoundsMin.x / gridSize.x) * gridSize.x,
+                    localBoundsMin.y, // Assuming y-axis alignment isn't needed; adjust if necessary
+                    Mathf.Round(localBoundsMin.z / gridSize.z) * gridSize.z
                 );
 
+                // Transform the aligned position back to world space
+                Vector3 worldGridAlignedPosition = boundaryCube.transform.TransformPoint(localGridAlignedPosition);
+
                 // Calculate and apply the offset needed to align the object within the grid
-                offset = gridAlignedPosition - new Vector3(bounds.min.x, transform.position.y, bounds.min.z);
+                offset = worldGridAlignedPosition - bounds.min;
                 transform.position += offset;
             }
             else
@@ -398,6 +427,7 @@ else
         }
         return offset;
     }
+
 
     void CheckAndAdjustBoundaries()
     {

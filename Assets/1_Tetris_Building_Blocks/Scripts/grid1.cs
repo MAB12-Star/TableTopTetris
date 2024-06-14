@@ -23,8 +23,10 @@ public class Grid1 : MonoBehaviour
     public int currentLevel = 1;
     private int scoreThreshold = 10;
     private EncouragingWords encouragingWords;
+    private Quaternion lastBoundaryCubeRotation;
     
-    
+    public Material lineMaterial;
+
 
 
     /// <summary>
@@ -39,7 +41,7 @@ public class Grid1 : MonoBehaviour
     [SerializeField] private TextMeshProUGUI levelTextMeshPro;
     [SerializeField] private TextMeshProUGUI youWinTextMeshPro;
 
-    void OnDrawGizmos()
+    public void OnDrawGizmos()
 {
     GameObject boundaryCube = GameObject.Find("Boundary_Cube");
     if (boundaryCube != null)
@@ -67,7 +69,8 @@ public class Grid1 : MonoBehaviour
             {
                 Vector3 start = startPosition + new Vector3(x * cellSizeX, y * cellSizeY, 0);
                 Vector3 end = start + new Vector3(0, 0, objectScale.z);
-                Gizmos.DrawLine(start, end);
+             
+
             }
         }
 
@@ -95,6 +98,7 @@ public class Grid1 : MonoBehaviour
     }
 }
 
+   
 
     public Vector3 GetGridUnitSize()
     {
@@ -140,9 +144,15 @@ public class Grid1 : MonoBehaviour
             UpdateGridSize(boundaryCube.transform.localScale);
             Quaternion rotation = GameObject.Find("Boundary_Cube").transform.rotation;
 
+          
+
+
+            //InitializeGrid();
+
+          
+
             // Update the grid rotation
-           
-            InitializeGrid();
+
             // Initialize the level display to show level 1
             UpdateLevelDisplay(currentLevel);
         }
@@ -155,20 +165,35 @@ public class Grid1 : MonoBehaviour
     }
 
 
+    private Vector3 lastBoundaryCubePosition; // Store the last known position of the boundary cube
+
     private void Update()
     {
         GameObject boundaryCube = GameObject.Find("Boundary_Cube");
         if (boundaryCube != null)
         {
-            lastBoundaryCubeSize = boundaryCube.transform.localScale;
-            UpdateGridRotation(boundaryCube.transform.rotation);
+            if (boundaryCube.transform.localScale != lastBoundaryCubeSize)
+            {
+                lastBoundaryCubeSize = boundaryCube.transform.localScale;
+                UpdateGridSize(boundaryCube.transform.localScale);
+                Debug.Log("Grid size and cells updated due to boundary cube size change.");
+            }
+
+            if (boundaryCube.transform.position != lastBoundaryCubePosition || boundaryCube.transform.rotation != lastBoundaryCubeRotation)
+            {
+                lastBoundaryCubePosition = boundaryCube.transform.position; // Update the saved position
+                lastBoundaryCubeRotation = boundaryCube.transform.rotation; // Update the saved rotation
+                AdjustAndReinitializeGrid();
+                Debug.Log("Grid cells updated due to boundary cube position or rotation change.");
+            }
         }
         else
         {
             Debug.LogError("Boundary_Cube GameObject not found in the scene.");
         }
-
     }
+
+
 
     private void UpdateGridSize(Vector3 transformScale)
     {
@@ -179,13 +204,7 @@ public class Grid1 : MonoBehaviour
         Debug.Log($"Grid unit size updated: {gridUnitSize}");
     }
 
-    public void UpdateGridRotation(Quaternion rotation)
-    {
-        // Update the grid rotation based on the provided rotation
-        transform.rotation = rotation;
-
-        // Update other aspects of the grid if needed...
-    }
+    
 
     public class GridCell
     {
@@ -203,7 +222,7 @@ public class Grid1 : MonoBehaviour
 
     GridCell[,,] gridCells; // Table array to hold grid cells
 
-    private void InitializeGrid()
+    public void InitializeGrid()
     {
         GameObject boundaryCube = GameObject.Find("Boundary_Cube");
         if (boundaryCube == null)
@@ -214,7 +233,9 @@ public class Grid1 : MonoBehaviour
 
         float colliderOffset = 0.02f; // Offset value for collider size
         float colliderCenterYOffset = 0.0f; // Offset for collider center on the Y-axis
+        Quaternion rotation = boundaryCube.transform.rotation; // Get the rotation of the boundary cube
 
+        lastBoundaryCubeRotation = boundaryCube.transform.rotation;
         gridCells = new GridCell[width, height, depth]; // Initialize the table array
         Debug.Log("Grid Dimensions: " + width + " x " + height + " x " + depth);
 
@@ -255,35 +276,75 @@ public class Grid1 : MonoBehaviour
 
                     // Add IsOccupied boolean and set it to false by default
                     gridUnit.AddComponent<GridUnit>().IsOccupied = false;
+
+                    // Add LineRenderer to visualize the grid unit
+                    AddLineRenderer(gridUnit, gridUnitSize, boundaryCube.transform.rotation);
                 }
             }
         }
-        // Debug information to verify grid initialization
-        /*  Debug.Log("Grid initialized. Contents of gridCells array:");
-          for (int x = 0; x < width; x++)
-          {
-              for (int y = 0; y < height; y++)
-              {
-                  for (int z = 0; z < depth; z++)
-                  {
-                      Debug.Log($"GridCell at ({x}, {y}, {z}): {gridCells[x, y, z].GridUnitObject.name}");
-                  }
-              }
-          }*/
     }
 
+
+    private void AddLineRenderer(GameObject gridUnit, Vector3 gridUnitSize, Quaternion rotation)
+    {
+        LineRenderer lineRenderer = gridUnit.AddComponent<LineRenderer>();
+        lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+        lineRenderer.startColor = Color.blue;
+        lineRenderer.endColor = Color.blue;
+        lineRenderer.startWidth = 0.01f;
+        lineRenderer.endWidth = 0.01f;
+        lineRenderer.positionCount = 8;
+        lineRenderer.loop = true;
+
+        Vector3 halfSize = gridUnitSize / 2;
+        Vector3[] vertices = new Vector3[]
+        {
+        new Vector3(-halfSize.x, -halfSize.y, -halfSize.z),
+        new Vector3(halfSize.x, -halfSize.y, -halfSize.z),
+        new Vector3(halfSize.x, -halfSize.y, halfSize.z),
+        new Vector3(-halfSize.x, -halfSize.y, halfSize.z),
+        new Vector3(-halfSize.x, halfSize.y, halfSize.z),
+        new Vector3(halfSize.x, halfSize.y, halfSize.z),
+        new Vector3(halfSize.x, halfSize.y, -halfSize.z),
+        new Vector3(-halfSize.x, halfSize.y, -halfSize.z)
+        };
+
+        for (int i = 0; i < vertices.Length; i++)
+        {
+            vertices[i] = rotation * vertices[i] + gridUnit.transform.position;
+        }
+
+        lineRenderer.SetPositions(vertices);
+    }
 
     public Vector3 CalculateCellCenter(int x, int y, int z)
     {
         GameObject boundaryCube = GameObject.Find("Boundary_Cube");
         if (boundaryCube != null)
         {
-            Vector3 objectScale = boundaryCube.GetComponent<BoxCollider>().size;
-            Vector3 startPosition = boundaryCube.transform.position - objectScale / 2; // Bottom left back corner
+            BoxCollider boxCollider = boundaryCube.GetComponent<BoxCollider>();
+            Vector3 objectScale = boxCollider.size;
+            Vector3 startPosition = boundaryCube.transform.position - boundaryCube.transform.rotation * (objectScale / 2); // Bottom left back corner
+
             float cellSizeX = objectScale.x / width;
-            float cellSizeY = (objectScale.y) /height; 
+            float cellSizeY = (objectScale.y) / height;
             float cellSizeZ = objectScale.z / depth;
-            return startPosition + new Vector3(x * cellSizeX + cellSizeX / 2f, y * cellSizeY + cellSizeY / 2f, z * cellSizeZ + cellSizeZ / 2f);
+
+            // Calculate the local position of the cell within the grid
+            Vector3 localPosition = new Vector3(
+                x * cellSizeX + cellSizeX / 2f,
+                y * cellSizeY + cellSizeY / 2f,
+                z * cellSizeZ + cellSizeZ / 2f
+            );
+
+            // Apply the rotation to the local position
+            Quaternion rotation = boundaryCube.transform.rotation;
+            Vector3 rotatedPosition = rotation * localPosition;
+
+            // Calculate the final position by adding the rotated position to the start position
+            Vector3 finalPosition = startPosition + rotatedPosition;
+
+            return finalPosition;
         }
         else
         {
@@ -710,20 +771,71 @@ public class Grid1 : MonoBehaviour
 
     public void AdjustAndReinitializeGrid()
     {
-
         GameObject boundaryCube = GameObject.Find("Boundary_Cube");
         if (boundaryCube != null)
         {
-            // Initialize grid size based on the initial scale of the boundary cube's BoxCollider
-           
-            InitializeGrid();
+            // Update grid orientation and position based on the boundary cube's transform
+            UpdateGridOrientation(boundaryCube.transform.rotation);
+            UpdateGridPosition(boundaryCube.transform.position);
         }
-
-
-        // Reinitialize the grid to reflect new dimensions
-
     }
-    // Add to your existing class
+
+    private void UpdateGridOrientation(Quaternion newRotation)
+    {
+        // Adjust grid cells rotation
+        AdjustGridCellsRotation(newRotation);
+        Debug.Log("Grid orientation updated.");
+    }
+
+    private void UpdateGridPosition(Vector3 newPosition)
+    {
+        // Adjust grid cells position
+        AdjustGridCellsPosition(newPosition);
+        Debug.Log("Grid position updated.");
+    }
+
+    private void AdjustGridCellsRotation(Quaternion newRotation)
+    {
+        // Assuming gridCells is already initialized and represents the current grid
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                for (int z = 0; z < depth; z++)
+                {
+                    GridCell cell = gridCells[x, y, z];
+                    if (cell != null && cell.GridUnitObject != null)
+                    {
+                        // Apply rotation to the grid unit object
+                        cell.GridUnitObject.transform.rotation = newRotation;
+                    }
+                }
+            }
+        }
+    }
+
+    private void AdjustGridCellsPosition(Vector3 newPosition)
+    {
+        // Assuming gridCells is already initialized and represents the current grid
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                for (int z = 0; z < depth; z++)
+                {
+                    GridCell cell = gridCells[x, y, z];
+                    if (cell != null && cell.GridUnitObject != null)
+                    {
+                        // Apply position offset based on the new boundary cube position
+                        Vector3 cellLocalPosition = CalculateCellCenter(x, y, z);
+                        cell.GridUnitObject.transform.position = newPosition + cellLocalPosition;
+                    }
+                }
+            }
+        }
+    }
+
+
 
     public void ResizeGridAndBoundaryCube(float newWidth, float newHeight, float newDepth)
     {
