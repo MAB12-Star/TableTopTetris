@@ -203,22 +203,22 @@ PrefabInstance:
     - target: {fileID: 253419382219343717, guid: 1d4e1bdc6e421bf48851cbe06cd643f7,
         type: 3}
       propertyPath: m_Name
-      value: Cube L
+      value: Cube S
       objectReference: {fileID: 0}
     - target: {fileID: 2297923885652274947, guid: 1d4e1bdc6e421bf48851cbe06cd643f7,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.05
+      value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 2297923885652274947, guid: 1d4e1bdc6e421bf48851cbe06cd643f7,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.05
+      value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 2297923885652274947, guid: 1d4e1bdc6e421bf48851cbe06cd643f7,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.05
+      value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 2297923885652274947, guid: 1d4e1bdc6e421bf48851cbe06cd643f7,
         type: 3}
@@ -339,10 +339,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 253419382219343717, guid: 1d4e1bdc6e421bf48851cbe06cd643f7,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: -8664953262224404518}
-    - targetCorrespondingSourceObject: {fileID: 253419382219343717, guid: 1d4e1bdc6e421bf48851cbe06cd643f7,
-        type: 3}
-      insertIndex: -1
       addedObject: {fileID: 3210097374935174134}
   m_SourcePrefab: {fileID: 100100000, guid: 1d4e1bdc6e421bf48851cbe06cd643f7, type: 3}
 --- !u!1 &804349169420902157 stripped
@@ -351,22 +347,6 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 625381165164173416}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &-8664953262224404518
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 804349169420902157}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e1143edc2e41b2c478b44e586e92c153, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  fallSpeed: 0.3
-  moveSpeed: 1
-  gridSize: 1
-  rotationCooldown: 0.2
 --- !u!64 &3210097374935174134
 MeshCollider:
   m_ObjectHideFlags: 0

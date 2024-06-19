@@ -28,8 +28,9 @@ public class CubeMovement : MonoBehaviour
     private bool isNudgeMode = false;
     private AudioSource audioSource;
     private AudioManager1 audioManager;
-    private TrailRenderer trailRenderer;
-   
+    public GameObject ObjectTrail;
+
+    
 
     /// <summary>
     /// This list contains all colliders tagged cube_child in this trasform
@@ -68,18 +69,17 @@ public class CubeMovement : MonoBehaviour
         
         // Find and store the Grid1 instance
         grid = FindObjectOfType<Grid1>();
-        //audioSource = GetComponent<AudioSource>();
-        //AudioManager.instance.Play("BackgroundMusic");
+        audioSource = GetComponent<AudioSource>();
+        audioManager = GetComponent<AudioManager1>();
         // Check if grid is found
         if (grid == null)
         {
             Debug.LogError("Grid1 instance not found!");
             return;
         }
+      
 
 
-        rigidbody = GetComponent<Rigidbody>();
-       
 
         // Now you can access gridSizeX from grid
         int gridSizeX = grid.width; // Assuming 'width' is the number of cells along the X-axis
@@ -227,7 +227,7 @@ else
         if (rigidbody != null)
         {
             rigidbody.useGravity = enable;
-           
+
 
         }
     }
@@ -259,6 +259,7 @@ else
                 Vector3 movement = new Vector3(localJoystickInput.x * gridUnitSize.x, 0, localJoystickInput.z * gridUnitSize.z) * moveSpeed;
                 Vector3 newPosition = transform.position + movement;
 
+
                 // Optionally, clamp newPosition within the boundary defined by the Boundary_Cube and grid dimensions
                 // newPosition = ClampPositionWithinBoundary(newPosition, boundaryCube.transform.position, grid);
 
@@ -274,9 +275,7 @@ else
     void HandleRotationAndGravity()
     {
         Vector2 rightThumbstickInput = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick);
-#if UNITY_EDITOR
-        rightThumbstickInput = new Vector2(Input.GetAxis("NewHorizontal"), Input.GetAxis("NewVertical"));
-#endif
+
         float rightStickHorizontal = rightThumbstickInput.x;
         float rightStickVertical = rightThumbstickInput.y;
 
@@ -285,15 +284,14 @@ else
         {
             rigidbody.useGravity = true;
             AudioManager1.Instance.PlaySfx("cube_drop");
-
            
+    
 
-            
+
+
         }
-        
-    }
 
-   
+    }
 
 
 
@@ -396,24 +394,18 @@ else
             if (gridComponent != null)
             {
                 Vector3 gridSize = gridComponent.GetGridUnitSize();
+
                 Bounds bounds = CalculateCombinedBounds(); // Use your existing method to calculate bounds
 
-                // Transform bounds center to local space of the boundary cube
-                Vector3 localBoundsMin = boundaryCube.transform.InverseTransformPoint(bounds.min);
-                Vector3 localBoundsCenter = boundaryCube.transform.InverseTransformPoint(bounds.center);
-
-                // Adjust for grid alignment in local space, using grid unit size
-                Vector3 localGridAlignedPosition = new Vector3(
-                    Mathf.Round(localBoundsMin.x / gridSize.x) * gridSize.x,
-                    localBoundsMin.y, // Assuming y-axis alignment isn't needed; adjust if necessary
-                    Mathf.Round(localBoundsMin.z / gridSize.z) * gridSize.z
+                // Adjust for grid alignment, using grid unit size
+                Vector3 gridAlignedPosition = new Vector3(
+                    Mathf.Round((bounds.min.x - boundaryCube.transform.position.x) / gridSize.x) * gridSize.x + boundaryCube.transform.position.x,
+                    bounds.min.y, // Assuming y-axis alignment isn't needed; adjust if necessary
+                    Mathf.Round((bounds.min.z - boundaryCube.transform.position.z) / gridSize.z) * gridSize.z + boundaryCube.transform.position.z
                 );
 
-                // Transform the aligned position back to world space
-                Vector3 worldGridAlignedPosition = boundaryCube.transform.TransformPoint(localGridAlignedPosition);
-
                 // Calculate and apply the offset needed to align the object within the grid
-                offset = worldGridAlignedPosition - bounds.min;
+                offset = gridAlignedPosition - new Vector3(bounds.min.x, transform.position.y, bounds.min.z);
                 transform.position += offset;
             }
             else
@@ -427,7 +419,6 @@ else
         }
         return offset;
     }
-
 
     void CheckAndAdjustBoundaries()
     {
@@ -491,8 +482,9 @@ else
                
                 AudioManager1.Instance.PlaySfx("cube_collide");
                 
-               
-                
+
+
+
 
             }
 

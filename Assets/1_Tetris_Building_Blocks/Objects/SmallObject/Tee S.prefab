@@ -740,8 +740,6 @@ GameObject:
   - component: {fileID: 1676603064166688727}
   - component: {fileID: 8565709117180344123}
   - component: {fileID: 5517189073175267116}
-  - component: {fileID: 3438968270387134507}
-  - component: {fileID: 8565632798942737676}
   m_Layer: 0
   m_Name: Tee S
   m_TagString: Cube
@@ -759,7 +757,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.05, y: 0.05, z: 0.05}
+  m_LocalScale: {x: 0.4, y: 0.4, z: 0.4}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1517828558871225600}
@@ -838,32 +836,3 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.9116503, y: 2.7184007, z: 0.8847888}
   m_Center: {x: 0.4970287, y: 0.53631115, z: 0.0009682401}
---- !u!114 &3438968270387134507
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8325184679264577624}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e1143edc2e41b2c478b44e586e92c153, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  fallSpeed: 0.3
-  moveSpeed: 1
-  gridSize: 1
-  rotationCooldown: 0.2
---- !u!114 &8565632798942737676
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8325184679264577624}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 45d9ffd1ab592914eb60c081f0305ed3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mass: 1

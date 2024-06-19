@@ -116,7 +116,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2631731511835889426}
   - component: {fileID: 4810410173395542765}
-  - component: {fileID: 1120657216701822413}
   - component: {fileID: 1807774349710672406}
   m_Layer: 0
   m_Name: Rectangel S
@@ -135,7 +134,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.05, y: 0.05, z: 0.05}
+  m_LocalScale: {x: 0.4, y: 0.4, z: 0.4}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6642294607786728780}
@@ -170,22 +169,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 122
   m_CollisionDetection: 1
---- !u!114 &1120657216701822413
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2742270308844105058}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e1143edc2e41b2c478b44e586e92c153, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  fallSpeed: 0.3
-  moveSpeed: 1
-  gridSize: 1
-  rotationCooldown: 0.2
 --- !u!65 &1807774349710672406
 BoxCollider:
   m_ObjectHideFlags: 0

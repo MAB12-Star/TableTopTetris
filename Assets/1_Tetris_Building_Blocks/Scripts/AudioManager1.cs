@@ -14,6 +14,9 @@ public class AudioManager1 : MonoBehaviour
     public AudioSource sfxSource;
     public Grid1 Grid;
     private string currentSceneName;
+
+    private int currentSongIndex = 0; // Keep track of the current song index
+
     private void Awake()
     {
         // Ensure only one instance of AudioManager1 exists
@@ -37,10 +40,6 @@ public class AudioManager1 : MonoBehaviour
         {
             PlayMusic("Theme1");
         }
-       /* else if (currentSceneName == "2-Scene")
-        {
-            PlayMusic("Theme3");
-        }*/
     }
 
     private void Update()
@@ -55,26 +54,9 @@ public class AudioManager1 : MonoBehaviour
             {
                 PlayMusic("Theme1");
             }
-            else if (currentSceneName == "2-Scene")
-            {
-                PlayMusic("Theme3");
-            }
-        }
-
-        // Check if the current level is 2
-        if (Grid.currentLevel == 2)
-        {
-            PlayMusic("Theme4");
-        }
-        else if (Grid.currentLevel == 3)
-        {
-            PlayMusic("Theme5");
-        }
-        else if (Grid.currentLevel == 4)
-        {
-            PlayMusic("Theme5");
         }
     }
+
     public void PlayMusic(string name)
     {
         Sound s = Array.Find(musicSounds, x => x.name == name);
@@ -113,5 +95,14 @@ public class AudioManager1 : MonoBehaviour
         {
             musicSource.Stop();
         }
+    }
+
+    public void PlayNextSong()
+    {
+        // Increment the current song index and loop back if necessary
+        currentSongIndex = (currentSongIndex + 1) % musicSounds.Length;
+
+        // Play the next song in the list
+        PlayMusic(musicSounds[currentSongIndex].name);
     }
 }

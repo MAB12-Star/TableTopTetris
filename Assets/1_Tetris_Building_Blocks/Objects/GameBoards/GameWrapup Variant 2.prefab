@@ -4398,7 +4398,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blockId: 5838e892-31a4-4f65-a415-dc108aefa14c
-  instanceId: d0035cf4-40db-40c6-b0f8-7f84f7171aa7
+  instanceId: 840c9beb-716f-4a4a-91ea-5e4799e622cf
   version: 1
 --- !u!114 &133194645995165857
 MonoBehaviour:
@@ -5485,6 +5485,7 @@ Transform:
   - {fileID: 8234757207367349022}
   - {fileID: 5014913804882449103}
   - {fileID: 6386611098245345979}
+  - {fileID: 3632242616995910179}
   m_Father: {fileID: 3777800644003522417}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6878771109170145676
@@ -5507,6 +5508,7 @@ MonoBehaviour:
   score: 0
   level: 1
   currentLevel: 1
+  explosion: {fileID: 0}
   scoreTextMeshPro: {fileID: 8484491415878304609}
   levelTextMeshPro: {fileID: 6448553245785327811}
   youWinTextMeshPro: {fileID: 5994492490735332760}
@@ -6835,12 +6837,12 @@ Transform:
   m_GameObject: {fileID: 4950569428415490661}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.008000001, y: 0.349, z: -0.535}
+  m_LocalPosition: {x: -0.007999986, y: -0.651, z: -0.535}
   m_LocalScale: {x: 1.01, y: 0.51, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7114036758273422602}
-  m_Father: {fileID: 3777800644003522417}
+  m_Father: {fileID: 6886693411906770819}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &4025705347204380467
 MeshRenderer:
@@ -7104,7 +7106,6 @@ Transform:
   - {fileID: 4933470695262910836}
   - {fileID: 3187999841319887730}
   - {fileID: 3375054959477574451}
-  - {fileID: 3632242616995910179}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &1128007731504300083
@@ -7937,7 +7938,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blockId: f8766c17-aaf8-4b55-9431-de8deea83842
-  instanceId: 8029265f-3d2a-408d-86b9-f22e768726fa
+  instanceId: 95d8effa-256c-4f94-b347-d78bf1ccbd6e
   version: 1
 --- !u!114 &4299576828569950990
 MonoBehaviour:
@@ -8140,7 +8141,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blockId: 5838e892-31a4-4f65-a415-dc108aefa14c
-  instanceId: 599df302-ff84-4b63-bdeb-349690dd78bf
+  instanceId: eadcbda0-3e79-47d4-b356-b22930ade688
   version: 1
 --- !u!114 &3592474311919642013
 MonoBehaviour:
@@ -10564,7 +10565,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blockId: 5838e892-31a4-4f65-a415-dc108aefa14c
-  instanceId: 70f41efa-2d40-44a9-ab80-f5e8179a32cb
+  instanceId: 2cef8264-180e-4880-9f45-dcefc5ee2d39
   version: 1
 --- !u!114 &35784786818551294
 MonoBehaviour:
@@ -11401,7 +11402,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blockId: f8766c17-aaf8-4b55-9431-de8deea83842
-  instanceId: 92e2b617-3b61-4991-b4d1-99804e5cae93
+  instanceId: 9a7673ab-338a-4e6f-94d7-c67dfe0fff6f
   version: 1
 --- !u!114 &1257592371897448714
 MonoBehaviour:
@@ -13048,14 +13049,13 @@ MonoBehaviour:
   cubePrefabsWithPreview:
   - cubePrefab: {fileID: 804349169420902157, guid: e0f74511a2bb2b6408f126ee094608d3,
       type: 3}
-    previewImage: {fileID: 2800000, guid: 105272696c08dc3468fe17c65eb36a3b, type: 3}
+    previewObject: {fileID: 0}
   - cubePrefab: {fileID: 804349169420902157, guid: e3c02d8a50a6bcd4dbcd2f82be5286a3,
       type: 3}
-    previewImage: {fileID: 2800000, guid: c5e42c41d14b7a243ad8ab1d569c067a, type: 3}
+    previewObject: {fileID: 0}
   fallSpeed: 10
   stoppingPlane: {fileID: 9123210409883636472}
   nextBlockObject: {fileID: 0}
-  nextBlockRawImage: {fileID: 3663528860376936180}
 --- !u!1 &8529427935584742849
 GameObject:
   m_ObjectHideFlags: 0

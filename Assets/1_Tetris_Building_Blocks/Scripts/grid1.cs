@@ -19,13 +19,15 @@ public class Grid1 : MonoBehaviour
     float originalTimeScale = 1.0f;
     public Material swapMaterial;
     public int score = 0;
-    public int level = 1;
+    public int level = 3;
     public int currentLevel = 1;
     private int scoreThreshold = 10;
     private EncouragingWords encouragingWords;
     private Quaternion lastBoundaryCubeRotation;
-    
-    public Material lineMaterial;
+    private SceneEffects effects;
+    public GameObject explosion;
+    private AudioManager1 audioManager;
+
 
 
 
@@ -41,7 +43,7 @@ public class Grid1 : MonoBehaviour
     [SerializeField] private TextMeshProUGUI levelTextMeshPro;
     [SerializeField] private TextMeshProUGUI youWinTextMeshPro;
 
-    public void OnDrawGizmos()
+    void OnDrawGizmos()
 {
     GameObject boundaryCube = GameObject.Find("Boundary_Cube");
     if (boundaryCube != null)
@@ -69,8 +71,7 @@ public class Grid1 : MonoBehaviour
             {
                 Vector3 start = startPosition + new Vector3(x * cellSizeX, y * cellSizeY, 0);
                 Vector3 end = start + new Vector3(0, 0, objectScale.z);
-             
-
+                Gizmos.DrawLine(start, end);
             }
         }
 
@@ -98,7 +99,6 @@ public class Grid1 : MonoBehaviour
     }
 }
 
-   
 
     public Vector3 GetGridUnitSize()
     {
@@ -144,15 +144,9 @@ public class Grid1 : MonoBehaviour
             UpdateGridSize(boundaryCube.transform.localScale);
             Quaternion rotation = GameObject.Find("Boundary_Cube").transform.rotation;
 
-          
-
-
-            //InitializeGrid();
-
-          
-
             // Update the grid rotation
-
+           
+            InitializeGrid();
             // Initialize the level display to show level 1
             UpdateLevelDisplay(currentLevel);
         }
@@ -162,38 +156,32 @@ public class Grid1 : MonoBehaviour
         {
             Debug.LogError("EncouragingWords script not found!");
         }
+        effects = FindObjectOfType<SceneEffects>();
+        if (effects == null)
+        {
+            Debug.LogError("EffectsClass script not found in the scene.");
+        }
+
+
+        audioManager = GetComponent<AudioManager1>();
+
     }
 
-
-    private Vector3 lastBoundaryCubePosition; // Store the last known position of the boundary cube
 
     private void Update()
     {
         GameObject boundaryCube = GameObject.Find("Boundary_Cube");
         if (boundaryCube != null)
         {
-            if (boundaryCube.transform.localScale != lastBoundaryCubeSize)
-            {
-                lastBoundaryCubeSize = boundaryCube.transform.localScale;
-                UpdateGridSize(boundaryCube.transform.localScale);
-                Debug.Log("Grid size and cells updated due to boundary cube size change.");
-            }
-
-            if (boundaryCube.transform.position != lastBoundaryCubePosition || boundaryCube.transform.rotation != lastBoundaryCubeRotation)
-            {
-                lastBoundaryCubePosition = boundaryCube.transform.position; // Update the saved position
-                lastBoundaryCubeRotation = boundaryCube.transform.rotation; // Update the saved rotation
-                AdjustAndReinitializeGrid();
-                Debug.Log("Grid cells updated due to boundary cube position or rotation change.");
-            }
+            lastBoundaryCubeSize = boundaryCube.transform.localScale;
+            UpdateGridRotation(boundaryCube.transform.rotation);
         }
         else
         {
             Debug.LogError("Boundary_Cube GameObject not found in the scene.");
         }
+
     }
-
-
 
     private void UpdateGridSize(Vector3 transformScale)
     {
@@ -204,7 +192,13 @@ public class Grid1 : MonoBehaviour
         Debug.Log($"Grid unit size updated: {gridUnitSize}");
     }
 
-    
+    public void UpdateGridRotation(Quaternion rotation)
+    {
+        // Update the grid rotation based on the provided rotation
+        transform.rotation = rotation;
+
+        // Update other aspects of the grid if needed...
+    }
 
     public class GridCell
     {
@@ -222,7 +216,7 @@ public class Grid1 : MonoBehaviour
 
     GridCell[,,] gridCells; // Table array to hold grid cells
 
-    public void InitializeGrid()
+    private void InitializeGrid()
     {
         GameObject boundaryCube = GameObject.Find("Boundary_Cube");
         if (boundaryCube == null)
@@ -233,9 +227,11 @@ public class Grid1 : MonoBehaviour
 
         float colliderOffset = 0.02f; // Offset value for collider size
         float colliderCenterYOffset = 0.0f; // Offset for collider center on the Y-axis
+
         Quaternion rotation = boundaryCube.transform.rotation; // Get the rotation of the boundary cube
 
         lastBoundaryCubeRotation = boundaryCube.transform.rotation;
+
         gridCells = new GridCell[width, height, depth]; // Initialize the table array
         Debug.Log("Grid Dimensions: " + width + " x " + height + " x " + depth);
 
@@ -276,9 +272,8 @@ public class Grid1 : MonoBehaviour
 
                     // Add IsOccupied boolean and set it to false by default
                     gridUnit.AddComponent<GridUnit>().IsOccupied = false;
-
                     // Add LineRenderer to visualize the grid unit
-                    AddLineRenderer(gridUnit, gridUnitSize, boundaryCube.transform.rotation);
+                    //AddLineRenderer(gridUnit, gridUnitSize, boundaryCube.transform.rotation);
                 }
             }
         }
@@ -299,14 +294,14 @@ public class Grid1 : MonoBehaviour
         Vector3 halfSize = gridUnitSize / 2;
         Vector3[] vertices = new Vector3[]
         {
-        new Vector3(-halfSize.x, -halfSize.y, -halfSize.z),
-        new Vector3(halfSize.x, -halfSize.y, -halfSize.z),
-        new Vector3(halfSize.x, -halfSize.y, halfSize.z),
-        new Vector3(-halfSize.x, -halfSize.y, halfSize.z),
-        new Vector3(-halfSize.x, halfSize.y, halfSize.z),
-        new Vector3(halfSize.x, halfSize.y, halfSize.z),
-        new Vector3(halfSize.x, halfSize.y, -halfSize.z),
-        new Vector3(-halfSize.x, halfSize.y, -halfSize.z)
+     new Vector3(-halfSize.x, -halfSize.y, -halfSize.z),
+     new Vector3(halfSize.x, -halfSize.y, -halfSize.z),
+     new Vector3(halfSize.x, -halfSize.y, halfSize.z),
+     new Vector3(-halfSize.x, -halfSize.y, halfSize.z),
+     new Vector3(-halfSize.x, halfSize.y, halfSize.z),
+     new Vector3(halfSize.x, halfSize.y, halfSize.z),
+     new Vector3(halfSize.x, halfSize.y, -halfSize.z),
+     new Vector3(-halfSize.x, halfSize.y, -halfSize.z)
         };
 
         for (int i = 0; i < vertices.Length; i++)
@@ -352,6 +347,7 @@ public class Grid1 : MonoBehaviour
             return Vector3.zero;
         }
     }
+
 
 
 
@@ -499,14 +495,22 @@ public class Grid1 : MonoBehaviour
                         if (renderer != null && swapMaterial != null)
                         {
                             renderer.material = swapMaterial;
+                            
                         }
+                        
                     }
+
+                    
 
                     Debug.Log($"Full row found along {axis}-axis at Y={y}. Materials have been swapped.");
                 }
                 else
                 {
                     Debug.Log($"Row is not full at Y={y} along {axis}-axis.");
+                }
+                if (isRowFull)
+                {
+                    effects.LowerOpacity();
                 }
             }
         }
@@ -529,7 +533,11 @@ public class Grid1 : MonoBehaviour
             {
                 // Increase the level
                 currentLevel++;
-                AudioManager1.Instance.PlayMusic("Theme2");
+                
+                explosion.SetActive(true);
+                AudioManager1.Instance.PlaySfx("NextLevel");
+                AudioManager1.Instance.PlayNextSong(); 
+
 
                 // Update the level display
                 UpdateLevelDisplay(currentLevel);
@@ -561,6 +569,7 @@ public class Grid1 : MonoBehaviour
 
         // Clear the encouraging word
         encouragingWords.ClearText();
+        explosion.SetActive(false); 
     }
 
     public void UpdateLevelDisplay(int newLevel)
@@ -569,12 +578,29 @@ public class Grid1 : MonoBehaviour
         {
             // Update the level display
             levelTextMeshPro.text = newLevel.ToString();
+
+            // Play the appropriate music based on the level
+            switch (newLevel)
+            {
+                
+                case 2:
+                    AudioManager1.Instance.PlayMusic("Theme3");
+                    break;
+                case 3:
+                    AudioManager1.Instance.PlayMusic("Theme4");
+                    break;
+                case 4:
+                    AudioManager1.Instance.PlayMusic("Theme5");
+                    break;
+                
+            }
         }
         else
         {
             Debug.LogError("No reference found for levelTextMeshPro. Failed to update level!");
         }
     }
+
 
     private void CheckAndClearFullLayers(Vector3 halfCellSize)
     {
@@ -638,6 +664,7 @@ public class Grid1 : MonoBehaviour
                     Time.timeScale = 1.0f + (0.3f * increments);
                 }
 
+                effects.RaiseOpacity(); 
                 // Process and delete parents and their children
                 ProcessAndDeleteObjects(parentsToDelete, childObjectsToDelete);
 
@@ -698,6 +725,7 @@ public class Grid1 : MonoBehaviour
         if (childMeshCollider == null)
         {
             childMeshCollider = child.AddComponent<MeshCollider>();
+           
 
         }
 
@@ -771,71 +799,20 @@ public class Grid1 : MonoBehaviour
 
     public void AdjustAndReinitializeGrid()
     {
+
         GameObject boundaryCube = GameObject.Find("Boundary_Cube");
         if (boundaryCube != null)
         {
-            // Update grid orientation and position based on the boundary cube's transform
-            UpdateGridOrientation(boundaryCube.transform.rotation);
-            UpdateGridPosition(boundaryCube.transform.position);
+            // Initialize grid size based on the initial scale of the boundary cube's BoxCollider
+           
+            InitializeGrid();
         }
+
+
+        // Reinitialize the grid to reflect new dimensions
+
     }
-
-    private void UpdateGridOrientation(Quaternion newRotation)
-    {
-        // Adjust grid cells rotation
-        AdjustGridCellsRotation(newRotation);
-        Debug.Log("Grid orientation updated.");
-    }
-
-    private void UpdateGridPosition(Vector3 newPosition)
-    {
-        // Adjust grid cells position
-        AdjustGridCellsPosition(newPosition);
-        Debug.Log("Grid position updated.");
-    }
-
-    private void AdjustGridCellsRotation(Quaternion newRotation)
-    {
-        // Assuming gridCells is already initialized and represents the current grid
-        for (int x = 0; x < width; x++)
-        {
-            for (int y = 0; y < height; y++)
-            {
-                for (int z = 0; z < depth; z++)
-                {
-                    GridCell cell = gridCells[x, y, z];
-                    if (cell != null && cell.GridUnitObject != null)
-                    {
-                        // Apply rotation to the grid unit object
-                        cell.GridUnitObject.transform.rotation = newRotation;
-                    }
-                }
-            }
-        }
-    }
-
-    private void AdjustGridCellsPosition(Vector3 newPosition)
-    {
-        // Assuming gridCells is already initialized and represents the current grid
-        for (int x = 0; x < width; x++)
-        {
-            for (int y = 0; y < height; y++)
-            {
-                for (int z = 0; z < depth; z++)
-                {
-                    GridCell cell = gridCells[x, y, z];
-                    if (cell != null && cell.GridUnitObject != null)
-                    {
-                        // Apply position offset based on the new boundary cube position
-                        Vector3 cellLocalPosition = CalculateCellCenter(x, y, z);
-                        cell.GridUnitObject.transform.position = newPosition + cellLocalPosition;
-                    }
-                }
-            }
-        }
-    }
-
-
+    // Add to your existing class
 
     public void ResizeGridAndBoundaryCube(float newWidth, float newHeight, float newDepth)
     {
