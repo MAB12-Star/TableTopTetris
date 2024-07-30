@@ -3,7 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
+
 
 public class Grid1 : MonoBehaviour
 {
@@ -26,7 +29,11 @@ public class Grid1 : MonoBehaviour
     private Quaternion lastBoundaryCubeRotation;
     private SceneEffects effects;
     public GameObject explosion;
+    public GameObject explosion2;   
     private AudioManager1 audioManager;
+    public GameObject boundaryCube;
+    public GameObject MenuUpdate;
+
 
 
 
@@ -43,62 +50,7 @@ public class Grid1 : MonoBehaviour
     [SerializeField] private TextMeshProUGUI levelTextMeshPro;
     [SerializeField] private TextMeshProUGUI youWinTextMeshPro;
 
-    void OnDrawGizmos()
-{
-    GameObject boundaryCube = GameObject.Find("Boundary_Cube");
-    if (boundaryCube != null)
-    {
-        Gizmos.color = Color.yellow;
-
-        // Assuming gridSize represents the number of cells along each dimension
-        int gridSizeX = width;  // Assuming 'width' is the number of cells along the X-axis
-        int gridSizeY = height; // Assuming 'height' is the number of cells along the Y-axis
-        int gridSizeZ = depth;  // Assuming 'depth' is the number of cells along the Z-axis
-
-        Vector3 objectScale = boundaryCube.transform.localScale;
-
-        // Calculate cell size based on boundary cube size and grid size
-        float cellSizeX = objectScale.x / gridSizeX;
-        float cellSizeY = (objectScale.y * 2) / gridSizeY; // Adjusted for the Y-axis
-        float cellSizeZ = objectScale.z / gridSizeZ;
-
-        Vector3 startPosition = boundaryCube.transform.position - new Vector3(objectScale.x / 2, objectScale.y, objectScale.z / 2); // Bottom left back corner adjusted for Y
-
-        // Draw grid lines along X-axis
-        for (int x = 0; x <= gridSizeX; x++)
-        {
-            for (int y = 0; y <= gridSizeY; y++)
-            {
-                Vector3 start = startPosition + new Vector3(x * cellSizeX, y * cellSizeY, 0);
-                Vector3 end = start + new Vector3(0, 0, objectScale.z);
-                Gizmos.DrawLine(start, end);
-            }
-        }
-
-        // Draw grid lines along Y-axis
-        for (int y = 0; y <= gridSizeY; y++)
-        {
-            for (int z = 0; z <= gridSizeZ; z++)
-            {
-                Vector3 start = startPosition + new Vector3(0, y * cellSizeY, z * cellSizeZ);
-                Vector3 end = start + new Vector3(objectScale.x, 0, 0);
-                Gizmos.DrawLine(start, end);
-            }
-        }
-
-        // Draw grid lines along Z-axis
-        for (int z = 0; z <= gridSizeZ; z++)
-        {
-            for (int x = 0; x <= gridSizeX; x++)
-            {
-                Vector3 start = startPosition + new Vector3(x * cellSizeX, 0, z * cellSizeZ);
-                Vector3 end = start + new Vector3(0, objectScale.y * 2, 0); // Adjusted for the Y-axis
-                Gizmos.DrawLine(start, end);
-            }
-        }
-    }
-}
-
+ 
 
     public Vector3 GetGridUnitSize()
     {
@@ -145,7 +97,7 @@ public class Grid1 : MonoBehaviour
             Quaternion rotation = GameObject.Find("Boundary_Cube").transform.rotation;
 
             // Update the grid rotation
-           
+
             InitializeGrid();
             // Initialize the level display to show level 1
             UpdateLevelDisplay(currentLevel);
@@ -216,7 +168,7 @@ public class Grid1 : MonoBehaviour
 
     GridCell[,,] gridCells; // Table array to hold grid cells
 
-    private void InitializeGrid()
+   public void InitializeGrid()
     {
         GameObject boundaryCube = GameObject.Find("Boundary_Cube");
         if (boundaryCube == null)
@@ -546,6 +498,10 @@ public class Grid1 : MonoBehaviour
                 {
                     youWinTextMeshPro.text = "You Win";
                     Time.timeScale = 0f;
+                    boundaryCube.SetActive(false);
+                    explosion2.SetActive(true);
+                    MenuUpdate.SetActive(true);
+
                 }
                 else
                 {
@@ -628,7 +584,7 @@ public class Grid1 : MonoBehaviour
 
                     foreach (var collider in colliders)
                     {
-                        if (collider.gameObject.CompareTag("cube_child") || (collider.gameObject.CompareTag("child")))
+                        if (collider.gameObject.CompareTag("cube_child") || collider.gameObject.CompareTag("child"))
                         {
                             foundChild = true;
                             GameObject parentObject = collider.transform.parent ? collider.transform.parent.gameObject : null;
@@ -664,7 +620,7 @@ public class Grid1 : MonoBehaviour
                     Time.timeScale = 1.0f + (0.3f * increments);
                 }
 
-                effects.RaiseOpacity(); 
+                effects.RaiseOpacity();
                 // Process and delete parents and their children
                 ProcessAndDeleteObjects(parentsToDelete, childObjectsToDelete);
 
@@ -681,9 +637,9 @@ public class Grid1 : MonoBehaviour
 
 
 
+
     private void ProcessAndDeleteObjects(HashSet<GameObject> parentsToDelete, List<GameObject> childObjectsToDelete)
     {
-
         foreach (GameObject parent in parentsToDelete)
         {
             foreach (Transform child in parent.transform)
@@ -691,10 +647,8 @@ public class Grid1 : MonoBehaviour
                 if (!childObjectsToDelete.Contains(child.gameObject)) // If child is not being deleted
                 {
                     child.SetParent(null); // Unparent the child
-                    AddOrUpdateRigidbody(child.gameObject);
-                   
+                    AddOrUpdateRigidbody(child.gameObject, false); // Pass false to avoid aligning the boundary cube
                 }
-
             }
             Destroy(parent); // Delete the parent
         }
@@ -706,27 +660,29 @@ public class Grid1 : MonoBehaviour
         }
         UpdateGridOccupancyStatus();
         EnsureAllRigidbodiesHaveGravity();
-    }
 
-    private void EnsureAllRigidbodiesHaveGravity()
-    {
-        Rigidbody[] allRigidbodies = FindObjectsOfType<Rigidbody>();
-        foreach (Rigidbody rb in allRigidbodies)
+    }
+        private void EnsureAllRigidbodiesHaveGravity()
         {
-            if (!rb.useGravity)
+            Rigidbody[] allRigidbodies = FindObjectsOfType<Rigidbody>();
+            foreach (Rigidbody rb in allRigidbodies)
             {
-                rb.useGravity = true; // Enforce gravity
+                if (!rb.useGravity)
+                {
+                    rb.useGravity = true; // Enforce gravity
+                }
             }
         }
-    }
-    private void AddOrUpdateRigidbody(GameObject child)
-    {   
+
+
+
+
+    private void AddOrUpdateRigidbody(GameObject child, bool alignToGrid)
+    {
         MeshCollider childMeshCollider = child.GetComponent<MeshCollider>();
         if (childMeshCollider == null)
         {
             childMeshCollider = child.AddComponent<MeshCollider>();
-           
-
         }
 
         childMeshCollider.convex = true;
@@ -735,18 +691,21 @@ public class Grid1 : MonoBehaviour
         if (childRigidbody == null) // Add Rigidbody if it doesn't exist
         {
             childRigidbody = child.AddComponent<Rigidbody>();
-            
         }
 
         // Set Rigidbody constraints
         childRigidbody.useGravity = true;
         childRigidbody.constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ |
                                      RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ | RigidbodyConstraints.FreezeRotationY;
-        AlignParentObjectToGrid();
-        
+
+        if (alignToGrid)
+        {
+            AlignParentObjectToGrid(child.transform); // Pass the transform of the object to be aligned
+        }
     }
 
-    void AlignParentObjectToGrid()
+
+    void AlignParentObjectToGrid(Transform objTransform)
     {
         GameObject boundaryCube = GameObject.Find("Boundary_Cube");
         if (boundaryCube != null)
@@ -758,8 +717,8 @@ public class Grid1 : MonoBehaviour
                 Vector3 gridSize = gridComponent.GetGridUnitSize();
                 Debug.Log($"Grid Size: {gridSize}");
 
-                Bounds bounds = new Bounds(transform.position, Vector3.zero);
-                foreach (Transform child in transform)
+                Bounds bounds = new Bounds(objTransform.position, Vector3.zero);
+                foreach (Transform child in objTransform)
                 {
                     Renderer childRenderer = child.GetComponent<Renderer>();
                     if (childRenderer != null)
@@ -783,8 +742,8 @@ public class Grid1 : MonoBehaviour
                 Vector3 offset = gridAlignedPosition - bounds.min;
                 Debug.Log($"Offset to Apply: {offset}");
 
-                // Apply the offset to the parent object to align it with the grid
-                transform.position += offset;
+                // Apply the offset to the object to align it with the grid
+                objTransform.position += offset;
             }
             else
             {
@@ -796,6 +755,7 @@ public class Grid1 : MonoBehaviour
             Debug.LogError("Boundary_Cube not found in the scene.");
         }
     }
+
 
     public void AdjustAndReinitializeGrid()
     {

@@ -1,4 +1,3 @@
-// CubeMovement.cs
 using UnityEngine;
 using System.Collections;
 using Unity.VisualScripting;
@@ -30,7 +29,7 @@ public class CubeMovement : MonoBehaviour
     private AudioManager1 audioManager;
     public GameObject ObjectTrail;
 
-    
+
 
     /// <summary>
     /// This list contains all colliders tagged cube_child in this trasform
@@ -66,7 +65,7 @@ public class CubeMovement : MonoBehaviour
 
     void Start()
     {
-        
+
         // Find and store the Grid1 instance
         grid = FindObjectOfType<Grid1>();
         audioSource = GetComponent<AudioSource>();
@@ -77,7 +76,7 @@ public class CubeMovement : MonoBehaviour
             Debug.LogError("Grid1 instance not found!");
             return;
         }
-      
+
 
 
 
@@ -111,30 +110,30 @@ public class CubeMovement : MonoBehaviour
         GameObject boundaryCube = GameObject.Find("Boundary_Cube");
 
         if (boundaryCube != null)
-{
-    // Get the Grid component on Boundary_Cube
-    grid = boundaryCube.GetComponent<Grid1>();
+        {
+            // Get the Grid component on Boundary_Cube
+            grid = boundaryCube.GetComponent<Grid1>();
 
-    if (grid != null)
-    {
-        boundaryCubeSizeX = grid.width;
-        boundaryCubeSizeY = grid.height;
-        boundaryCubeSizeZ = grid.depth;
-    }
-    else
-    {
-        Debug.LogError("Grid component not found on Boundary_Cube.");
-    }
-}
-else
-{
-    Debug.LogError("Boundary_Cube not found in the scene.");
-}
-      
+            if (grid != null)
+            {
+                boundaryCubeSizeX = grid.width;
+                boundaryCubeSizeY = grid.height;
+                boundaryCubeSizeZ = grid.depth;
+            }
+            else
+            {
+                Debug.LogError("Grid component not found on Boundary_Cube.");
+            }
+        }
+        else
+        {
+            Debug.LogError("Boundary_Cube not found in the scene.");
+        }
+
 
     }
 
-    
+
     private Vector3 GetCurrentGridScale()
     {
         GameObject boundaryCube = GameObject.Find("Boundary_Cube");
@@ -149,7 +148,7 @@ else
         return Vector3.one; // Default to 1x1x1 if boundary cube not found
     }
 
-  
+
 
     void EnsureObjectsWithinGrid()
     {
@@ -280,18 +279,16 @@ else
         float rightStickVertical = rightThumbstickInput.y;
 
         RotateCubeByAxis(rightStickHorizontal, rightStickVertical);
-        if (OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger, OVRInput.Controller.LTouch))
+
+        // Check if the X button on the left Oculus Touch controller is pressed
+        if (OVRInput.GetDown(OVRInput.Button.One, OVRInput.Controller.LTouch))
         {
             rigidbody.useGravity = true;
             AudioManager1.Instance.PlaySfx("cube_drop");
-           
-    
-
-
-
         }
-
     }
+
+
 
 
 
@@ -317,7 +314,7 @@ else
                 rotationAxis = horizontal > 0 ? Vector3.up : Vector3.down;
             }
             else if (Mathf.Abs(vertical) > 0)
-            {   
+            {
                 rotationAxis = vertical > 0 ? Vector3.right : Vector3.left;
             }
 
@@ -341,7 +338,7 @@ else
 
     }
 
-    
+
     public class ObjectSizeConstants : MonoBehaviour
     {
         // Define constants for object sizes
@@ -465,34 +462,29 @@ else
         return bounds;
     }
 
-   
+
     private bool hasCollided = false;
 
     private void OnCollisionEnter(Collision collision)
     {
         if (!hasCollided && (collision.gameObject.CompareTag("StoppingPlane") || (collision.gameObject.CompareTag("child") || (collision.gameObject.CompareTag("cube_child") || (collision.gameObject.CompareTag("Cube") && collision.gameObject.layer != LayerMask.NameToLayer("CubeLayer"))))))
         {
-           // Debug.Log("Object stopped at position: " + transform.position);
+            // Debug.Log("Object stopped at position: " + transform.position);
 
             if (!hasSpawnedTrigger)
             {
                 rigidbody.useGravity = true;
                 float delayInSeconds = 2f;
                 StartCoroutine(HandleCollisionWithDelay(delayInSeconds));
-               
+
                 AudioManager1.Instance.PlaySfx("cube_collide");
-                
 
-
-
-
+                // Spawn, play, and destroy particle effect
+                SpawnAndDestroyParticle(collision.contacts[0].point);
             }
 
             // Set the flag to true to indicate that collision has been handled
             hasCollided = true;
-            
-
-
 
             // Debug.Log("After Collision - Position: " + transform.position);
             bool isAligned = CheckAlignment();
@@ -510,17 +502,12 @@ else
                 // Debug.Log("Child position: " + childPosition);
                 // Debug.Log("Child alignment: X-" + alignedX + ", Z-" + alignedZ);
 
-
-                
                 if (!alignedX || !alignedZ)
                 {
                     isAligned = false;
                     break; // No need to check further if any child is misaligned
-
                 }
             }
-           
-
 
             if (!isAligned)
             {
@@ -528,16 +515,50 @@ else
                 AlignParentObjectToGrid();
 
                 // Optionally, enable nudge mode for manual adjustments if automatic alignment isn't perfect
-              
                 // Prevent normal movement while adjusting
                 Debug.Log("Misalignment detected. Attempting automatic alignment. Nudge mode enabled for manual adjustment if needed.");
             }
-           
-          
         }
     }
 
-   
+    private void SpawnAndDestroyParticle(Vector3 position)
+    {
+        // Assuming you have a reference to your SceneEffects instance
+        SceneEffects sceneEffects = FindObjectOfType<SceneEffects>();
+        if (sceneEffects != null && sceneEffects.particlePrefabs.Count > 0)
+        {
+            // Pick a random particle prefab
+            int randomIndex = Random.Range(0, sceneEffects.particlePrefabs.Count);
+            GameObject particlePrefab = sceneEffects.particlePrefabs[randomIndex];
+
+            // Offset the position in the Z direction
+            Vector3 spawnPosition = position + new Vector3(0, 0, -1); // Adjust the Z offset as needed
+
+            GameObject particleInstance = Instantiate(particlePrefab, spawnPosition, Quaternion.identity);
+            StartCoroutine(DestroyParticleAfterPlaying(particleInstance));
+        }
+    }
+
+    private IEnumerator DestroyParticleAfterPlaying(GameObject particleInstance)
+    {
+        ParticleSystem particleSystem = particleInstance.GetComponent<ParticleSystem>();
+        if (particleSystem != null)
+        {
+            // Wait for the particle system to finish
+            yield return new WaitWhile(() => particleSystem.IsAlive());
+            Destroy(particleInstance);
+        }
+        else
+        {
+            // Fallback if no particle system is found
+            yield return new WaitForSeconds(2f);
+            Destroy(particleInstance);
+        }
+    }
+
+
+
+
 
     private bool CheckAlignment()
     {
@@ -612,7 +633,7 @@ else
     public void ChangePosition(Vector3 movement)
     {
         transform.position += movement;
-        if(!CanMove())
+        if (!CanMove())
         {
             transform.position -= movement;
         }
@@ -645,7 +666,7 @@ else
     public bool CanMove()
     {
         bool objectFoundInWay = false;
-        
+
         foreach (BoxCollider boxCollider in BoxColliders)
         {
             Vector3 size = Vector3.Scale(boxCollider.size, boxCollider.transform.lossyScale) / 2;
@@ -682,12 +703,3 @@ else
         return false;
     }
 }
-
-
-
-
-
-
-
-
-

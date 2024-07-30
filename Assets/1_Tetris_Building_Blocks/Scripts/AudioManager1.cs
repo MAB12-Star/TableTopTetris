@@ -16,6 +16,7 @@ public class AudioManager1 : MonoBehaviour
     private string currentSceneName;
 
     private int currentSongIndex = 0; // Keep track of the current song index
+    private float musicTime = 0f; // Keep track of the current time of the music
 
     private void Awake()
     {
@@ -70,6 +71,7 @@ public class AudioManager1 : MonoBehaviour
 
         // Play the music
         musicSource.clip = s.clip;
+        musicSource.time = musicTime; // Resume from the saved time
         musicSource.Play();
     }
 
@@ -90,9 +92,10 @@ public class AudioManager1 : MonoBehaviour
 
     public void StopMusic()
     {
-        // Stops the music currently playing
+        // Stops the music currently playing and save the current time
         if (musicSource.isPlaying)
         {
+            musicTime = musicSource.time;
             musicSource.Stop();
         }
     }
@@ -102,7 +105,24 @@ public class AudioManager1 : MonoBehaviour
         // Increment the current song index and loop back if necessary
         currentSongIndex = (currentSongIndex + 1) % musicSounds.Length;
 
+        // Reset the music time for the next song
+        musicTime = 0f;
+
         // Play the next song in the list
         PlayMusic(musicSounds[currentSongIndex].name);
+    }
+
+    public void Play()
+    {
+        // Resume playing music from where it left off
+        if (!musicSource.isPlaying && musicSource.clip != null)
+        {
+            musicSource.Play();
+        }
+    }
+
+    public void SetVolume(float volume)
+    {
+        musicSource.volume = volume;
     }
 }
